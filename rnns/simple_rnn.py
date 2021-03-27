@@ -55,9 +55,10 @@ def gen_model(x_train,y_train,x_test,sc):
 
 model, preds = gen_model(x_train,y_train,x_test,sc)
 
+diff = len(test_data)-len(preds)
 plt.figure(figsize=(20,5))
 plt.plot(preds,label='prediction')
-plt.plot(test_data,label='actual')
+plt.plot(test_data[diff:],label='actual')
 plt.title(f'predicting IBM daily highs for 2017 based on 2006-2016 daily highs')
 plt.legend()
 plt.savefig('../imgs/graph.png')
