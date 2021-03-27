@@ -1,6 +1,7 @@
 from fastquant import get_stock_data
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
-df = get_stock_data("AAPL", "2020-01-01", "2021-01-01")
-print(df.head())
+df = get_stock_data("AAPL", "2001-03-26", "2021-03-26")
+print(len(df))
