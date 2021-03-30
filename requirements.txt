@@ -8,3 +8,4 @@ numpy==1.19.5
 nltk==3.5
 matplotlib==3.3.4
 fastquant==0.1.4.0
+hmmlearn==0.2.5
