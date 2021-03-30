@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 training_data = get_stock_data("AAPL", "2003-02-10", "2004-09-10")
 testing_data = get_stock_data("AAPL", "2004-09-13", "2005-01-21")
 
-print(training_data.head())
-
 def data_prep(data):
     df = pd.DataFrame(data=None, columns=['fracChange','fracHigh','fracLow'])
     df['fracChange'] = (data['close']-data['open'])/data['open']
@@ -22,10 +20,20 @@ def data_prep(data):
 
 x_train = data_prep(training_data)
 x_test = data_prep(testing_data)
+
+print('TEST DATA')
 print(x_test.head())
+
+print('TRAIN DATA')
+print(x_train.head())
+
+# create observed data of O_1,...,O_d,O_d+1
+next_day = x_test.iloc[0].values
+observed = np.vstack((next_day,x_train.values))
+print(observed)
 
 
 model = hmm.GMMHMM(n_components=4,n_mix=5,algorithm="map",n_iter=100)
 model.fit(x_train)
-post = model.predict_proba([[-0.008082, 0.005296, 0.015855]],lengths=[1])
-print(post)
+log_lik = model.score(observed)
+print(log_lik)
