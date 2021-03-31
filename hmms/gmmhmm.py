@@ -53,15 +53,17 @@ class GmmHMM:
                                 n_iter=self.n_iter)
 
         self.model.fit(train_obs)
+
+        return train_obs
     
-    def test(self,test_data):
+    def test(self,test_data, train_obs):
         test_obs = self.data_prep(test_data)
         
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
 
         # use a latency of d days. So observations start as training data
-        observed = self.train_obs.iloc[-self.d:].values
+        observed = train_obs.iloc[-self.d:].values
         
         # list to hold predictions
         preds = []
@@ -102,9 +104,9 @@ if __name__ == "__main__":
     train_data = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
 
-    model.train(train_data=train_data)
+    train_obs = model.train(train_data=train_data)
 
-    preds,actual = model.test(test_data=test_data)
+    preds,actual = model.test(test_data=test_data, train_obs=train_obs)
     error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'AAPL error: {error}')
 
@@ -123,9 +125,9 @@ if __name__ == "__main__":
     train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
 
-    model.train(train_data=train_data)
+    train_obs = model.train(train_data=train_data)
 
-    preds,actual = model.test(test_data=test_data)
+    preds,actual = model.test(test_data=test_data, train_obs=train_obs)
     error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'IBM error: {error}')
 
@@ -144,9 +146,9 @@ if __name__ == "__main__":
     train_data = model.get_data(ticker='DELL',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='DELL',start_date='2004-09-13',end_date='2005-01-21')
 
-    model.train(train_data=train_data)
+    train_obs = model.train(train_data=train_data)
 
-    preds,actual = model.test(test_data=test_data)
+    preds,actual = model.test(test_data=test_data, train_obs=train_obs)
     error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'DELL error: {error}')
 
