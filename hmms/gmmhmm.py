@@ -97,8 +97,8 @@ class GmmHMM:
             pred_close = best['obs'][0]*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close)
 
-            print(f'{i}/{len(test_data)} done',end='\r')
-                
+            print(f'{i+1}/{len(test_data)}',end='\r')
+        print('DONE')
         return preds,test_close_prices
             
 
