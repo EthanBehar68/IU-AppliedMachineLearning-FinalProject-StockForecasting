@@ -106,6 +106,53 @@ class GmmHMM:
 if __name__ == "__main__":
     # training with apple feb-10-2003 -> sep-10-2004
     # testing with apple sep-13-2004 -> jan-21-2005
+    
+    # model = GmmHMM(n_components=4,
+    #                n_mix=5,
+    #                algorithm="map",
+    #                n_iter=100,
+    #                d=10)
+    
+    # train_data = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
+    # test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
+
+    # train_obs = model.train(train_data=train_data)
+
+    # start = time.time()
+    # preds,actual = model.test(test_data=test_data, train_obs=train_obs)
+    # end = time.time()
+    # print(f'model tested in {round((end-start)/60,2)} minutes')
+    # error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+    # print(f'AAPL error: {error}')
+
+    # model.plot_results(preds=preds, actual=actual, 
+    #                    title='GMM HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
+    
+    # # training with IBM feb-10-2003 -> sep-10-2004
+    # # testing with IBM sep-13-2004 -> jan-21-2005
+
+    # model = GmmHMM(n_components=4,
+    #                n_mix=5,
+    #                algorithm="map",
+    #                n_iter=100,
+    #                d=10)
+    
+    # train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
+    # test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
+
+    # train_obs = model.train(train_data=train_data)
+
+    # start = time.time()
+    # preds,actual = model.test(test_data=test_data, train_obs=train_obs)
+    # end = time.time()
+    # print(f'model tested in {round((end-start)/60,2)} minutes')
+    # error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+    # print(f'IBM error: {error}')
+
+    # model.plot_results(preds=preds, actual=actual, 
+    #                    title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
+    
+
 
     model = GmmHMM(n_components=4,
                    n_mix=5,
@@ -113,8 +160,8 @@ if __name__ == "__main__":
                    n_iter=100,
                    d=10)
     
-    train_data = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
-    test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
+    train_data = model.get_data(ticker='GME',start_date='2020-01-15',end_date='2021-01-15')
+    test_data = model.get_data(ticker='GME',start_date='2021-01-19',end_date='2021-03-30')
 
     train_obs = model.train(train_data=train_data)
 
@@ -126,98 +173,4 @@ if __name__ == "__main__":
     print(f'AAPL error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
-    
-    # training with IBM feb-10-2003 -> sep-10-2004
-    # testing with IBM sep-13-2004 -> jan-21-2005
-
-    model = GmmHMM(n_components=4,
-                   n_mix=5,
-                   algorithm="map",
-                   n_iter=100,
-                   d=10)
-    
-    train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
-    test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
-
-    train_obs = model.train(train_data=train_data)
-
-    start = time.time()
-    preds,actual = model.test(test_data=test_data, train_obs=train_obs)
-    end = time.time()
-    print(f'model tested in {round((end-start)/60,2)} minutes')
-    error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-    print(f'IBM error: {error}')
-
-    model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
-    
-    # training with dell feb-10-2003 -> sep-10-2004
-    # testing with dell sep-13-2004 -> jan-21-2005
-
-    model = GmmHMM(n_components=4,
-                   n_mix=5,
-                   algorithm="map",
-                   n_iter=100,
-                   d=10)
-    
-    train_data = model.get_data(ticker='DELL',start_date='2003-02-10',end_date='2004-09-10')
-    test_data = model.get_data(ticker='DELL',start_date='2004-09-13',end_date='2005-01-21')
-
-    train_obs = model.train(train_data=train_data)
-
-    start = time.time()
-    preds,actual = model.test(test_data=test_data, train_obs=train_obs)
-    end = time.time()
-    print(f'model tested in {round((end-start)/60,2)} minutes')
-    error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-    print(f'DELL error: {error}')
-
-    model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM DELL forcasted vs actual stock prices Sep 2004 - Jan 2005')
-
-
-
-
-
-# closes = testing_data['close'].values
-# opens = testing_data['open'].values
-# preds = []
-
-
-# observed = x_train.iloc[-10:].values
-# for i in range(len(x_test)):
-#     # d = 10
-#     # create observed data of O_1,...,O_d,O_d+1
-#     # try 50x10x10 possible values for O_d+1 and find max log lik
-#     fracChange = np.arange(-0.1,0.1,0.2/50)
-#     fracHigh = np.arange(0,0.1,0.1/10)
-#     fracLow = np.arange(0,0.1,0.1/10)
-#     best = {'next_day': None, 'loglik': -math.inf}
-#     for change in fracChange:
-#         for high in fracHigh:
-#             for low in fracLow:
-#                 next_day = np.array([change,high,low])
-#                 observed_test = np.vstack((observed,next_day))
-#                 log_lik = model.score(observed_test)
-#                 if log_lik > best['loglik']:
-#                     best['next_day'],best['loglik'] = next_day,log_lik
-
-#     best_frac_change = best['next_day']
-#     observed = np.vstack((observed,next_day))
-#     # calc predicted close value
-#     pred_close = best['next_day'][0]*opens[i]+opens[i]
-#     preds.append(pred_close)
-
-#     # drop the O_1 observation to slide the window for the next observation
-#     observed = observed[1:]
-
-#     print(f'predicted close: {pred_close}')
-#     print(f'actual close   : {closes[i]}\n')
-
-
-# print(best)
-# open_test = testing_data['open'][0]
-# pred_close = best['next_day'][0]*open_test+open_test
-# print(pred_close)
-# print(testing_data['close'][0])
+                       title='GMM HMM GME forcasted vs actual stock prices Jan 2021 - Mar 2021')
