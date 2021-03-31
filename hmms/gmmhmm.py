@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
+import time
 
 
 class GmmHMM:
@@ -117,7 +118,10 @@ if __name__ == "__main__":
 
     train_obs = model.train(train_data=train_data)
 
+    start = time.time()
     preds,actual = model.test(test_data=test_data, train_obs=train_obs)
+    end = time.time()
+    print(f'model tested in {round((end-start)/60,2)} minutes')
     error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'AAPL error: {error}')
 
@@ -138,7 +142,10 @@ if __name__ == "__main__":
 
     train_obs = model.train(train_data=train_data)
 
+    start = time.time()
     preds,actual = model.test(test_data=test_data, train_obs=train_obs)
+    end = time.time()
+    print(f'model tested in {round((end-start)/60,2)} minutes')
     error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'IBM error: {error}')
 
@@ -159,7 +166,10 @@ if __name__ == "__main__":
 
     train_obs = model.train(train_data=train_data)
 
+    start = time.time()
     preds,actual = model.test(test_data=test_data, train_obs=train_obs)
+    end = time.time()
+    print(f'model tested in {round((end-start)/60,2)} minutes')
     error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'DELL error: {error}')
 
