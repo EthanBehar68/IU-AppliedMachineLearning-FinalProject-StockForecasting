@@ -118,7 +118,7 @@ if __name__ == "__main__":
     train_obs = model.train(train_data=train_data)
 
     preds,actual = model.test(test_data=test_data, train_obs=train_obs)
-    error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+    error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'AAPL error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     train_obs = model.train(train_data=train_data)
 
     preds,actual = model.test(test_data=test_data, train_obs=train_obs)
-    error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+    error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'IBM error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     train_obs = model.train(train_data=train_data)
 
     preds,actual = model.test(test_data=test_data, train_obs=train_obs)
-    error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+    error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'DELL error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
