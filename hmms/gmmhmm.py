@@ -73,20 +73,31 @@ class GmmHMM:
             # try 50x10x10 possible values for O_d+1
             change = np.arange(-0.1,0.1,0.2/50)
             high = np.arange(0,0.1,0.1/10)
-            low = np.arange(0,0.1,0.1/10)            
-            observations = [np.vstack((observed,np.array([c,h,l]))) \
-                for l in low for h in high for c in change]
+            low = np.arange(0,0.1,0.1/10)
 
-            best = max(observations, key=self.model.score)
+            best = {'obs':None, 'log_lik':-math.inf}
+            for c in change:
+                for h in high:
+                    for l in low:
+                        # create new observation and score it
+                        o = np.array([c,h,l])
+                        obs = np.vstack((observed,o))
+                        log_lik = model.score(obs)
+
+                        # update to find MAP P(O_1,...,O_d,O_d+1|model)
+                        if log_lik > best['log_lik']:
+                            best['obs'],best['log_lik'] = o,log_lik
 
             # actually stack the best day on to the observations to use for next test point
             # drop the first thing in observed to shift our latency window `d`
-            observed = np.vstack((observed,best))
+            observed = np.vstack((observed,best['obs']))
             observed = observed[1:]
 
             #calculate the close value from best
-            pred_close = best[0]*test_open_prices[i]+test_open_prices[i]
+            pred_close = best['obs'][0]*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close)
+
+            print(f'{i}/{len(test_data)} done',end='\r')
                 
         return preds,test_close_prices
             
