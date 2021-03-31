@@ -82,7 +82,7 @@ class GmmHMM:
                         # create new observation and score it
                         o = np.array([c,h,l])
                         obs = np.vstack((observed,o))
-                        log_lik = model.score(obs)
+                        log_lik = self.model.score(obs)
 
                         # update to find MAP P(O_1,...,O_d,O_d+1|model)
                         if log_lik > best['log_lik']:
