@@ -1,0 +1,10 @@
+Simple RNN:
+3 SimpleRNN layers with 32 inputs. Returns full sequence.
+1 SimpleRNN layer with 32 inputs. Does not return full sequence
+1 Dense layer with 1 input. 
+input -> 32 -> 32 -> 32 -> 32noFS -> 1
+Activation: Tanh
+Kernel Initializer: Glorot Uniform
+Recurrent Initializer: Orthogonal
+Bias Initializer: Zeros
+Optimizer = RMSProp
