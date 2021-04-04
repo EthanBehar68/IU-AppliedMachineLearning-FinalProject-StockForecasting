@@ -20,3 +20,9 @@ Then go ahead an install the requirements:
 python3.6 -m pip install --upgrade pip
 python3.6 -m pip install -r requirements.txt
 ```
+
+To run it with a jupyter notebook:
+
+```
+python3.6 -m ipykernel install --user --name=proj_env
+```
