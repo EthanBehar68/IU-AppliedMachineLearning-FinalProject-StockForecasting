@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
-from keras.layers import Dense, SimpleRNN
+from keras.layers import Dense, GRU 
 import tensorflow as tf
 import config as cf
 
@@ -45,9 +45,6 @@ x_test = np.reshape(x_test, (*x_test.shape,1))
 def gen_model(x_train,y_train,x_test,sc):
     model = Sequential()
     model.add(tf.keras.layers.GRU(32, return_sequences=True))
-    model.add(SimpleRNN(32, return_sequences=True))
-    model.add(SimpleRNN(32, return_sequences=True))
-    model.add(SimpleRNN(32))
     model.add(Dense(1))
 
     model.compile(optimizer='rmsprop', loss='mean_squared_error')
