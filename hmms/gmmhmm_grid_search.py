@@ -118,11 +118,11 @@ class GmmHMM:
 
 if __name__ == "__main__":
     # pull in data
-    train_data_aapl = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
-    test_data_aapl = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
+    train_data_aapl = get_stock_data('AAPL','2003-02-10','2004-09-10')
+    test_data_aapl = get_stock_data('AAPL','2004-09-13','2005-01-21')
     
-    train_data_ibm = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
-    test_data_ibm = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
+    train_data_ibm = get_stock_data('IBM','2003-02-10','2004-09-10')
+    test_data_ibm = get_stock_data('IBM','2004-09-13','2005-01-21')
 
 
     # preform grid search to find best model parameters
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         for n_mix in n_mix_vals:
             for d in d_vals:
                 print(f'n_components: {n_components} n_mix: {n_mix} d: {d}')
-                
+
                 # training with apple feb-10-2003 -> sep-10-2004
                 # testing with apple sep-13-2004 -> jan-21-2005
                 
