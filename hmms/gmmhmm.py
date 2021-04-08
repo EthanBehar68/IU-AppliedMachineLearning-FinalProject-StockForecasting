@@ -21,10 +21,12 @@ class GmmHMM:
         return get_stock_data(ticker, start_date, end_date)
 
     def data_prep(self, data):
+
         df = pd.DataFrame(data=None, columns=['fracChange','fracHigh','fracLow'])
         df['fracChange'] = (data['close']-data['open'])/data['open']
         df['fracHigh'] = (data['high']-data['open'])/data['open']
         df['fracLow'] = (data['open']-data['low'])/data['open']
+        df['fracVol'] = (data['volume']/data['volume'].sum())
 
         return df
 
@@ -75,19 +77,21 @@ class GmmHMM:
             change = np.arange(-0.1,0.1,0.2/50)
             high = np.arange(0,0.1,0.1/10)
             low = np.arange(0,0.1,0.1/10)
-
+            vol = np.arange(0.0001,0.0006,0.00005)
+            
             best = {'obs':None, 'log_lik':-math.inf}
             for c in change:
                 for h in high:
                     for l in low:
-                        # create new observation and score it
-                        o = np.array([c,h,l])
-                        obs = np.vstack((observed,o))
-                        log_lik = self.model.score(obs)
+                        for v in vol:
+                            # create new observation and score it
+                            o = np.array([c,h,l,v])
+                            obs = np.vstack((observed,o))
+                            log_lik = self.model.score(obs)
 
-                        # update to find MAP P(O_1,...,O_d,O_d+1|model)
-                        if log_lik > best['log_lik']:
-                            best['obs'],best['log_lik'] = o,log_lik
+                            # update to find MAP P(O_1,...,O_d,O_d+1|model)
+                            if log_lik > best['log_lik']:
+                                best['obs'],best['log_lik'] = o,log_lik
 
             # actually stack the best day on to the observations to use for next test point
             # drop the first thing in observed to shift our latency window `d`
@@ -114,8 +118,8 @@ if __name__ == "__main__":
                    d=10)
     
     train_data = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
-    test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
-
+    test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2004-11-21')
+    
     train_obs = model.train(train_data=train_data)
 
     start = time.time()
@@ -131,23 +135,23 @@ if __name__ == "__main__":
     # training with IBM feb-10-2003 -> sep-10-2004
     # testing with IBM sep-13-2004 -> jan-21-2005
 
-    model = GmmHMM(n_components=4,
-                   n_mix=5,
-                   algorithm="map",
-                   n_iter=100,
-                   d=10)
+    # model = GmmHMM(n_components=4,
+    #                n_mix=5,
+    #                algorithm="map",
+    #                n_iter=100,
+    #                d=10)
     
-    train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
-    test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
+    # train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
+    # test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
 
-    train_obs = model.train(train_data=train_data)
+    # train_obs = model.train(train_data=train_data)
 
-    start = time.time()
-    preds,actual = model.test(test_data=test_data, train_obs=train_obs)
-    end = time.time()
-    print(f'model tested in {round((end-start)/60,2)} minutes')
-    error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-    print(f'IBM error: {error}')
+    # start = time.time()
+    # preds,actual = model.test(test_data=test_data, train_obs=train_obs)
+    # end = time.time()
+    # print(f'model tested in {round((end-start)/60,2)} minutes')
+    # error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+    # print(f'IBM error: {error}')
 
-    model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
+    # model.plot_results(preds=preds, actual=actual, 
+    #                    title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
