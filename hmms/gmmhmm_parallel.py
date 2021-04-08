@@ -136,7 +136,7 @@ if __name__ == "__main__":
     print(f'AAPL error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
+                       title='GMM HMM w/ multithread AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
     
     # training with IBM feb-10-2003 -> sep-10-2004
     # testing with IBM sep-13-2004 -> jan-21-2005
@@ -160,4 +160,4 @@ if __name__ == "__main__":
     print(f'IBM error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
+                       title='GMM HMM w/ multithread IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
