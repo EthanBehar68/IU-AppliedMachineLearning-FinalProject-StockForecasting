@@ -65,9 +65,9 @@ class GmmHMM:
         for o in observations:
             obs = np.vstack((observed,o))
             log_lik = self.model.score(obs)
-            log_liks.append((o,log_lik))
+            yield (o,log_lik))
 
-        return log_liks
+        #return log_liks
     
     def test(self,test_data, train_obs):
         
