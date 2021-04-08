@@ -93,7 +93,7 @@ class GmmHMM:
             
             # compute all log likelihoods w/ their observations in parallel
             with Pool(processes=10) as pool:
-                log_liks = pool.starmap(log_lik_calc, [(observed, observations[i:i+500]) for i in range(0,5000,500)])
+                log_liks = pool.starmap(self.log_lik_calc, [(observed, observations[i:i+500]) for i in range(0,5000,500)])
 
             best = {'obs':None, 'log_lik':-math.inf}
             for obs,log_lik in log_liks:
