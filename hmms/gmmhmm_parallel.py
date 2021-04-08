@@ -60,7 +60,7 @@ class GmmHMM:
 
         return train_obs
     
-    def log_lik_calc(observed, observations):
+    def log_lik_calc(self, observed, observations):
         log_liks = []
         for o in observations:
             obs = np.vstack((observed,o))
