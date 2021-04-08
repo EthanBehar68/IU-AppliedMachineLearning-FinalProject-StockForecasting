@@ -59,7 +59,17 @@ class GmmHMM:
 
         return train_obs
     
+    def log_lik_calc(self, observed, observations):
+        log_liks = []
+        for o in observations:
+            obs = np.vstack((observed,o))
+            log_lik = self.model.score(obs)
+            log_liks.append((o,log_lik))
+
+        return log_liks
+    
     def test(self,test_data, train_obs):
+        
         test_obs = self.data_prep(test_data)
         
         test_close_prices = test_data['close'].values
@@ -78,20 +88,19 @@ class GmmHMM:
             high = np.arange(0,0.1,0.1/10)
             low = np.arange(0,0.1,0.1/10)
             vol = np.arange(0.0001,0.0006,0.00005)
-            
-            best = {'obs':None, 'log_lik':-math.inf}
-            for c in change:
-                for h in high:
-                    for l in low:
-                        for v in vol:
-                            # create new observation and score it
-                            o = np.array([c,h,l,v])
-                            obs = np.vstack((observed,o))
-                            log_lik = self.model.score(obs)
 
-                            # update to find MAP P(O_1,...,O_d,O_d+1|model)
-                            if log_lik > best['log_lik']:
-                                best['obs'],best['log_lik'] = o,log_lik
+            observations = [np.array([c,h,l,v]) for v in vol for l in low for h in high for c in change]
+            
+            # compute all log likelihoods w/ their observations in parallel
+            jump = int(len(observations)/20)
+            with Pool(processes=20) as pool:
+                results = pool.starmap(self.log_lik_calc, [(observed, observations[i:i+jump]) for i in range(0,len(observations),jump)])
+
+            best = {'obs':None, 'log_lik':-math.inf}
+            for log_liks in results:
+                for obs,log_lik in log_liks:
+                    if log_lik > best['log_lik']:
+                        best['obs'],best['log_lik'] = obs,log_lik
 
             # actually stack the best day on to the observations to use for next test point
             # drop the first thing in observed to shift our latency window `d`
@@ -154,4 +163,4 @@ if __name__ == "__main__":
     print(f'IBM error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM w/ vol IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
+                       title='GMM HMM vol IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
