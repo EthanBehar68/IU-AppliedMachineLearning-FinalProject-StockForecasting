@@ -95,6 +95,7 @@ class GmmHMM:
             with Pool(processes=10) as pool:
                 log_liks = pool.starmap(self.log_lik_calc, [(observed, observations[i:i+500]) for i in range(0,5000,500)])
 
+            print(log_liks)
             best = {'obs':None, 'log_lik':-math.inf}
             for obs,log_lik in log_liks:
                 if log_lik > best['log_lik']:
