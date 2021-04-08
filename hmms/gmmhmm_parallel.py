@@ -87,21 +87,17 @@ class GmmHMM:
             change = np.arange(-0.1,0.1,0.2/50)
             high = np.arange(0,0.1,0.1/10)
             low = np.arange(0,0.1,0.1/10)
-            
+
             observations = [np.array([c,h,l]) for l in low for h in high for c in change]
             
-            best = {'obs':None, 'log_lik':-math.inf}
-            for c in change:
-                for h in high:
-                    for l in low:
-                        # create new observation and score it
-                        o = np.array([c,h,l])
-                        obs = np.vstack((observed,o))
-                        log_lik = self.model.score(obs)
+            # compute all log likelihoods w/ their observations in parallel
+            with Pool(processes=10) as pool:
+                log_liks = pool.starmap(log_lik_calc, [(observed, observations[i:i+500]) for i in range(0,5000,500)])
 
-                        # update to find MAP P(O_1,...,O_d,O_d+1|model)
-                        if log_lik > best['log_lik']:
-                            best['obs'],best['log_lik'] = o,log_lik
+            best = {'obs':None, 'log_lik':-math.inf}
+            for obs,log_lik in log_liks:
+                if log_lik > best['log_lik']:
+                    best['obs'],best['log_lik'] = obs,log_lik
 
             # actually stack the best day on to the observations to use for next test point
             # drop the first thing in observed to shift our latency window `d`
