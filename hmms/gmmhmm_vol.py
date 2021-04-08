@@ -5,7 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 import time
-
+from multiprocessing import Pool
+import sys
 
 class GmmHMM:
     def __init__(self,n_components,n_mix,algorithm,n_iter,d):
