@@ -65,9 +65,9 @@ class GmmHMM:
         for o in observations:
             obs = np.vstack((observed,o))
             log_lik = self.model.score(obs)
-            yield (o,log_lik)
+            log_liks.append((o,log_lik))
 
-        #return log_liks
+        return log_liks
     
     def test(self,test_data, train_obs):
         
@@ -93,13 +93,13 @@ class GmmHMM:
             
             # compute all log likelihoods w/ their observations in parallel
             with Pool(processes=10) as pool:
-                log_liks = pool.starmap(self.log_lik_calc, [(observed, observations[i:i+500]) for i in range(0,5000,500)])
+                results = pool.starmap(self.log_lik_calc, [(observed, observations[i:i+500]) for i in range(0,5000,500)])
 
-            print(log_liks)
             best = {'obs':None, 'log_lik':-math.inf}
-            for obs,log_lik in log_liks:
-                if log_lik > best['log_lik']:
-                    best['obs'],best['log_lik'] = obs,log_lik
+            for log_liks in results:
+                for obs,log_lik in log_liks:
+                    if log_lik > best['log_lik']:
+                        best['obs'],best['log_lik'] = obs,log_lik
 
             # actually stack the best day on to the observations to use for next test point
             # drop the first thing in observed to shift our latency window `d`
