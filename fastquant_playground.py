@@ -4,4 +4,4 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 df = get_stock_data("AAPL", "2001-03-26", "2021-03-26")
-print(len(df))
+print(df['volume']/df['volume'].sum())
