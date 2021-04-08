@@ -153,7 +153,7 @@ if __name__ == "__main__":
                 end = time.time()
                 print(f'model tested in {round((end-start)/60,2)} minutes')
                 error_aapl = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-                print(f'AAPL error: {error}')
+                print(f'AAPL error: {error_aapl}')
                 
                 # training with IBM feb-10-2003 -> sep-10-2004
                 # testing with IBM sep-13-2004 -> jan-21-2005
@@ -171,7 +171,7 @@ if __name__ == "__main__":
                 end = time.time()
                 print(f'model tested in {round((end-start)/60,2)} minutes')
                 error_ibm = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-                print(f'IBM error: {error}')
+                print(f'IBM error: {error_ibm}')
 
                 error = error_aapl+error_ibm
 
