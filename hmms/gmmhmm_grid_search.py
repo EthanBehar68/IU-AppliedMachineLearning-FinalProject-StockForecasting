@@ -137,51 +137,55 @@ if __name__ == "__main__":
             for d in d_vals:
                 print(f'n_components: {n_components} n_mix: {n_mix} d: {d}')
 
-                # training with apple feb-10-2003 -> sep-10-2004
-                # testing with apple sep-13-2004 -> jan-21-2005
-                
-                model = GmmHMM(n_components=n_components,
-                            n_mix=n_mix,
-                            algorithm="map",
-                            n_iter=100,
-                            d=d)
+                try:
+                    # training with apple feb-10-2003 -> sep-10-2004
+                    # testing with apple sep-13-2004 -> jan-21-2005
+                    
+                    model = GmmHMM(n_components=n_components,
+                                n_mix=n_mix,
+                                algorithm="map",
+                                n_iter=100,
+                                d=d)
 
-                train_obs = model.train(train_data=train_data_aapl)
+                    train_obs = model.train(train_data=train_data_aapl)
 
-                start = time.time()
-                preds,actual = model.test(test_data=test_data_aapl, train_obs=train_obs)
-                end = time.time()
-                print(f'model tested in {round((end-start)/60,2)} minutes')
-                error_aapl = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-                print(f'AAPL error: {error_aapl}')
-                
-                # training with IBM feb-10-2003 -> sep-10-2004
-                # testing with IBM sep-13-2004 -> jan-21-2005
+                    start = time.time()
+                    preds,actual = model.test(test_data=test_data_aapl, train_obs=train_obs)
+                    end = time.time()
+                    print(f'model tested in {round((end-start)/60,2)} minutes')
+                    error_aapl = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+                    print(f'AAPL error: {error_aapl}')
+                    
+                    # training with IBM feb-10-2003 -> sep-10-2004
+                    # testing with IBM sep-13-2004 -> jan-21-2005
 
-                model = GmmHMM(n_components=n_components,
-                            n_mix=n_mix,
-                            algorithm="map",
-                            n_iter=100,
-                            d=d)
+                    model = GmmHMM(n_components=n_components,
+                                n_mix=n_mix,
+                                algorithm="map",
+                                n_iter=100,
+                                d=d)
 
-                train_obs = model.train(train_data=train_data_ibm)
+                    train_obs = model.train(train_data=train_data_ibm)
 
-                start = time.time()
-                preds,actual = model.test(test_data=test_data_ibm, train_obs=train_obs)
-                end = time.time()
-                print(f'model tested in {round((end-start)/60,2)} minutes')
-                error_ibm = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-                print(f'IBM error: {error_ibm}')
+                    start = time.time()
+                    preds,actual = model.test(test_data=test_data_ibm, train_obs=train_obs)
+                    end = time.time()
+                    print(f'model tested in {round((end-start)/60,2)} minutes')
+                    error_ibm = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+                    print(f'IBM error: {error_ibm}')
 
-                error = error_aapl+error_ibm
+                    error = error_aapl+error_ibm
 
-                if error < best_params['error']:
-                    best_params['n_components'] = n_components
-                    best_params['n_mix'] = n_mix
-                    best_params['d'] = d
-                    best_params['error'] = error
-                    best_params['aapl'] = error_aapl
-                    best_params['ibm'] = error_ibm
+                    if error < best_params['error']:
+                        best_params['n_components'] = n_components
+                        best_params['n_mix'] = n_mix
+                        best_params['d'] = d
+                        best_params['error'] = error
+                        best_params['aapl'] = error_aapl
+                        best_params['ibm'] = error_ibm
+
+                except ValueError:
+                    print('n_samples should be >= n_clusters')
     
     print(best_params)
     print(f'AAPL error: {best_params["aapl"]}')
