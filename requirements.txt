@@ -6,7 +6,7 @@ pymc3==3.10.0
 pandas==1.1.5
 numpy==1.19.5
 nltk==3.5
-matplotlib==3.3.4
+matplotlib==3.2.2
 fastquant==0.1.4.0
 hmmlearn==0.2.5
 ipykernel==5.5.3
