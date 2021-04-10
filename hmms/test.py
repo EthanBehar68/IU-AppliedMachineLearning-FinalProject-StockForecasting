@@ -95,7 +95,7 @@ class Test:
             # get and save error
             error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
 
-            self.results[f'{model.name}:{ticker}'] = error
+            self.results[f'{self.model.name}:{ticker}'] = error
         
         # write errors to file
         json = json.dumps(self.results)
