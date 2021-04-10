@@ -99,6 +99,6 @@ class Test:
         
         # write errors to file
         dump = json.dumps(self.results)
-        f = open(f, 'w')
-        f.write(dump)
-        f.close()
+        output_file = open(self.f, 'w')
+        output_file.write(dump)
+        output_file.close()
