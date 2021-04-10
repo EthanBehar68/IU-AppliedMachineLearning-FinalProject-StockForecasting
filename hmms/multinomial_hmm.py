@@ -53,7 +53,7 @@ class Multinomial_HMM:
         train_obs = self.data_prep(train_data)
         self.model = hmm.MultinomialHMM(n_components=self.n_components,
                                         algorithm=self.algorithm,
-                                        n_iter=self.niter)
+                                        n_iter=self.n_iter)
 
         self.model.fit(train_obs)
 
