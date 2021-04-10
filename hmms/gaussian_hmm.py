@@ -117,10 +117,10 @@ if __name__ == "__main__":
     # training with apple feb-10-2003 -> sep-10-2004
     # testing with apple sep-13-2004 -> jan-21-2005
     
-    model = Gaussian_HMM(n_components=best_params['n_components'],
+    model = Gaussian_HMM(n_components=5,
                          algorithm="map",
                          n_iter=100,
-                         d=best_params['d'])
+                         d=5)
     
     train_data = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
