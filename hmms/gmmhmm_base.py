@@ -12,8 +12,8 @@ from multiprocessing import Pool
 
 
 class GmmHMM(Model):
-    def __init__(self,params,name):
-        super().__init__(params, name)
+    def __init__(self,params):
+        super().__init__(params)
         self.n_components = params['n_components']
         self.n_mix = params['n_mix']
         self.algorithm = params['algorithm']
@@ -97,9 +97,11 @@ if __name__ == "__main__":
               'n_mix': 4, 
               'algorithm': 'map', 
               'n_iter': 100, 
-              'd': 5}
+              'd': 5,
+              'name':'GMMHMM'}
     
-    model = GmmHMM(params=params, name='GMMHMM')
-    
-    test = Test(model=model, tests=paper_tests, f='gmm-paper-tests.json')
+    test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-paper-tests.json')
+    test.run_tests()
+
+    test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-own-tests.json')
     test.run_tests()
