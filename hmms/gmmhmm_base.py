@@ -10,6 +10,9 @@ import sys
 from model import Model
 from test import *
 
+# lets us use model and test files as imports
+sys.path.append('..')
+
 class GmmHMM(Model):
     def __init__(self,params,name):
         super(params,name)
