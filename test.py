@@ -1,4 +1,9 @@
 import json
+from fastquant import get_stock_data
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
 
 # file to test using multiple tickers with dates
 paper_tests = {
@@ -13,7 +18,7 @@ paper_tests = {
             {'ticker':'IBM', 'start':'2003-02-10', 'end':'2004-09-12'},
         'test':
             {'ticker':'IBM', 'start':'2004-09-13', 'end':'2005-01-22'}
-    },
+    }
 }
 
 # own tests, more training data, and more recent stocks
@@ -56,7 +61,6 @@ own_tests = {
     }
 }
 
-
 class Test:
     def __init__(self, model, tests, f):
         self.model = model
@@ -94,3 +98,6 @@ class Test:
         f = open(f, 'w')
         f.write(json)
         f.close()
+    
+if __name__ == "__main__":
+    print('hi')
