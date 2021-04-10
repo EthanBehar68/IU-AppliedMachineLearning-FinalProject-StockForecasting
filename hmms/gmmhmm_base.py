@@ -8,6 +8,7 @@ import time
 from multiprocessing import Pool
 import sys
 
+best_params = {'n_components': 2, 'n_mix': 4, 'd': 5}
 
 class GmmHMM:
     def __init__(self,n_components,n_mix,algorithm,n_iter,d):
@@ -120,11 +121,11 @@ if __name__ == "__main__":
     # training with apple feb-10-2003 -> sep-10-2004
     # testing with apple sep-13-2004 -> jan-21-2005
     
-    model = GmmHMM(n_components=4,
-                   n_mix=5,
+    model = GmmHMM(n_components=best_params['n_components'],
+                   n_mix=best_params['n_mix'],
                    algorithm="map",
                    n_iter=100,
-                   d=10)
+                   d=best_params['d'])
     
     train_data = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
@@ -144,11 +145,11 @@ if __name__ == "__main__":
     # training with IBM feb-10-2003 -> sep-10-2004
     # testing with IBM sep-13-2004 -> jan-21-2005
 
-    model = GmmHMM(n_components=4,
-                   n_mix=5,
+    model = GmmHMM(n_components=best_params['n_components'],
+                   n_mix=best_params['n_mix'],
                    algorithm="map",
                    n_iter=100,
-                   d=10)
+                   d=best_params['d'])
     
     train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')

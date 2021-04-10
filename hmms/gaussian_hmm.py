@@ -8,12 +8,9 @@ import time
 from multiprocessing import Pool
 import sys
 
-best_params = {'n_components': 2, 'n_mix': 4, 'd': 5}
-
-class GmmHMM:
-    def __init__(self,n_components,n_mix,algorithm,n_iter,d):
+class Gaussian_HMM:
+    def __init__(self,n_components,algorithm,n_iter,d):
         self.n_components = n_components
-        self.n_mix = n_mix
         self.algorithm = algorithm
         self.n_iter = n_iter
         self.d = d
@@ -29,7 +26,6 @@ class GmmHMM:
         df['fracChange'] = (data['close']-data['open'])/data['open']
         df['fracHigh'] = (data['high']-data['open'])/data['open']
         df['fracLow'] = (data['open']-data['low'])/data['open']
-        df['fracVol'] = (data['volume']/data['volume'].sum())
 
         return df
 
@@ -53,10 +49,9 @@ class GmmHMM:
     
     def train(self, train_data):
         train_obs = self.data_prep(train_data)
-        self.model = hmm.GMMHMM(n_components=self.n_components,
-                                n_mix=self.n_mix,
-                                algorithm=self.algorithm,
-                                n_iter=self.n_iter)
+        self.model = hmm.GaussianHMM(n_components=self.n_components,
+                                     algorithm=self.algorithm,
+                                     n_iter=self.n_iter)
 
         self.model.fit(train_obs)
 
@@ -90,9 +85,8 @@ class GmmHMM:
             change = np.arange(-0.1,0.1,0.2/50)
             high = np.arange(0,0.1,0.1/10)
             low = np.arange(0,0.1,0.1/10)
-            vol = np.arange(0.0001,0.0006,0.00005)
 
-            observations = [np.array([c,h,l,v]) for v in vol for l in low for h in high for c in change]
+            observations = [np.array([c,h,l]) for l in low for h in high for c in change]
             
             # compute all log likelihoods w/ their observations in parallel
             jump = int(len(observations)/20)
@@ -123,11 +117,10 @@ if __name__ == "__main__":
     # training with apple feb-10-2003 -> sep-10-2004
     # testing with apple sep-13-2004 -> jan-21-2005
     
-    model = GmmHMM(n_components=best_params['n_components'],
-                   n_mix=best_params['n_mix'],
-                   algorithm="map",
-                   n_iter=100,
-                   d=best_params['d'])
+    model = Gaussian_HMM(n_components=5,
+                         algorithm="map",
+                         n_iter=100,
+                         d=5)
     
     train_data = model.get_data(ticker='AAPL',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='AAPL',start_date='2004-09-13',end_date='2005-01-21')
@@ -142,16 +135,15 @@ if __name__ == "__main__":
     print(f'AAPL error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM vol AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
+                       title='Gaussian HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
     
     # training with IBM feb-10-2003 -> sep-10-2004
     # testing with IBM sep-13-2004 -> jan-21-2005
-    
-    model = GmmHMM(n_components=best_params['n_components'],
-                   n_mix=best_params['n_mix'],
-                   algorithm="map",
-                   n_iter=100,
-                   d=best_params['d'])
+
+    model = Gaussian_HMM(n_components=5,
+                         algorithm="map",
+                         n_iter=100,
+                         d=5)
     
     train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
@@ -166,4 +158,4 @@ if __name__ == "__main__":
     print(f'IBM error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM vol IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
+                       title='Gaussian HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
