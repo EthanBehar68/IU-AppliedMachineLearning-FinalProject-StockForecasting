@@ -9,10 +9,11 @@ import math
 class Model(ABC):
 
     # params should be a dict of your parameters that you want to pass to the model
-    # name should be a string (used for saving results) 
-    def __init__(self, params, name):
+    # name should be a string (used for saving results)
+    # params dict *must* include 'name':name within it 
+    def __init__(self, params):
         self.model = None
-        self.name = name
+        self.name = params['name']
     
     # wrapper model function for collecting fastquant data
     def get_data(self, ticker, start_date, end_date):
