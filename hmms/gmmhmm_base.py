@@ -103,5 +103,5 @@ if __name__ == "__main__":
     test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-paper-tests.json')
     test.run_tests()
 
-    test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-own-tests.json')
+    test = Test(Model=GmmHMM, params=params, tests=own_tests, f='gmm-own-tests.json')
     test.run_tests()
