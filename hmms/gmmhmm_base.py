@@ -123,7 +123,7 @@ if __name__ == "__main__":
     
     model = GmmHMM(n_components=best_params['n_components'],
                    n_mix=best_params['n_mix'],
-                   algorithm="map",
+                   algorithm="viterbi",
                    n_iter=100,
                    d=best_params['d'])
     
@@ -139,15 +139,15 @@ if __name__ == "__main__":
     error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'AAPL error: {error}')
 
-    model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
+    # model.plot_results(preds=preds, actual=actual, 
+    #                    title='GMM HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
     
     # training with IBM feb-10-2003 -> sep-10-2004
     # testing with IBM sep-13-2004 -> jan-21-2005
 
     model = GmmHMM(n_components=best_params['n_components'],
                    n_mix=best_params['n_mix'],
-                   algorithm="map",
+                   algorithm="viterbi",
                    n_iter=100,
                    d=best_params['d'])
     
@@ -163,5 +163,5 @@ if __name__ == "__main__":
     error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
     print(f'IBM error: {error}')
 
-    model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
+    # model.plot_results(preds=preds, actual=actual, 
+    #                    title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
