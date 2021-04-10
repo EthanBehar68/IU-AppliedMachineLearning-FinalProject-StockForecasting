@@ -4,15 +4,15 @@ import json
 paper_tests = {
     'test1': {
         'train':
-            {'ticker':'AAPL', 'start':'2003-02-10', 'end':'2004-09-10'},
+            {'ticker':'AAPL', 'start':'2003-02-10', 'end':'2004-09-12'},
         'test':
-            {'ticker':'AAPL', 'start':'2004-09-13', 'end':'2005-01-21'}
+            {'ticker':'AAPL', 'start':'2004-09-13', 'end':'2005-01-22'}
     },
     'test2': {
         'train':
-            {'ticker':'IBM', 'start':'2003-02-10', 'end':'2004-09-10'},
+            {'ticker':'IBM', 'start':'2003-02-10', 'end':'2004-09-12'},
         'test':
-            {'ticker':'IBM', 'start':'2004-09-13', 'end':'2005-01-21'}
+            {'ticker':'IBM', 'start':'2004-09-13', 'end':'2005-01-22'}
     },
 }
 
