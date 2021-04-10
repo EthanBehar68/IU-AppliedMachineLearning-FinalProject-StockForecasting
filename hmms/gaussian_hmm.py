@@ -8,8 +8,6 @@ import time
 from multiprocessing import Pool
 import sys
 
-best_params = {'n_components': 2, 'n_mix': 4, 'd': 5}
-
 class Gaussian_HMM:
     def __init__(self,n_components,algorithm,n_iter,d):
         self.n_components = n_components
@@ -137,15 +135,15 @@ if __name__ == "__main__":
     print(f'AAPL error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
+                       title='Gaussian HMM AAPL forcasted vs actual stock prices Sep 2004 - Jan 2005')
     
     # training with IBM feb-10-2003 -> sep-10-2004
     # testing with IBM sep-13-2004 -> jan-21-2005
 
-    model = Gaussian_HMM(n_components=best_params['n_components'],
+    model = Gaussian_HMM(n_components=5,
                          algorithm="map",
                          n_iter=100,
-                         d=best_params['d'])
+                         d=5)
     
     train_data = model.get_data(ticker='IBM',start_date='2003-02-10',end_date='2004-09-10')
     test_data = model.get_data(ticker='IBM',start_date='2004-09-13',end_date='2005-01-21')
@@ -160,4 +158,4 @@ if __name__ == "__main__":
     print(f'IBM error: {error}')
 
     model.plot_results(preds=preds, actual=actual, 
-                       title='GMM HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
+                       title='Gaussian HMM IBM forcasted vs actual stock prices Sep 2004 - Jan 2005')
