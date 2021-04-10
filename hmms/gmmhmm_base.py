@@ -25,7 +25,6 @@ class GmmHMM(Model):
         self.n_iter = params['n_iter']
         self.d = params['d']
     
-    @Override
     def train(self, train_data):
         self.train_obs = self.data_prep(train_data)
         self.model = hmm.GMMHMM(n_components=self.n_components,
@@ -35,7 +34,6 @@ class GmmHMM(Model):
 
         self.model.fit(train_obs)
     
-    @Override
     def predict(self,test_data):
         test_obs = self.data_prep(test_data)
         
