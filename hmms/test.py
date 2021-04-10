@@ -98,7 +98,7 @@ class Test:
             self.results[f'{self.model.name}:{ticker}'] = error
         
         # write errors to file
-        json = json.dumps(self.results)
+        dump = json.dumps(self.results)
         f = open(f, 'w')
-        f.write(json)
+        f.write(dump)
         f.close()
