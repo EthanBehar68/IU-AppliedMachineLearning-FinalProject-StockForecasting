@@ -62,8 +62,9 @@ own_tests = {
 }
 
 class Test:
-    def __init__(self, model, tests, f):
-        self.model = model
+    def __init__(self, Model, params, tests, f):
+        self.Model = Model
+        self.params = params
         self.tests = tests
         self.results = {}
         self.f = f
@@ -74,6 +75,9 @@ class Test:
             testing_params = test['test']
 
             ticker = training_params['ticker']
+
+            # make the model
+            self.model = self.Model(params=self.params)
 
             # collect data from fastquant
             train_data = self.model.get_data(ticker=ticker,
