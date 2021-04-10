@@ -1,10 +1,6 @@
 import sys
-
-# lets us use model and test files as imports
-sys.path.append('..')
 from test import *
 from model import Model
-
 from fastquant import get_stock_data
 from hmmlearn import hmm
 import numpy as np
@@ -31,7 +27,7 @@ class GmmHMM(Model):
                                 algorithm=self.algorithm,
                                 n_iter=self.n_iter)
 
-        self.model.fit(train_obs)
+        self.model.fit(self.train_obs)
     
     def predict(self,test_data):
         test_obs = self.data_prep(test_data)
