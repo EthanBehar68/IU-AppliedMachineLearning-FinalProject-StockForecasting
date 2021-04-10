@@ -1,3 +1,8 @@
+import sys
+
+# lets us use model and test files as imports
+sys.path.append('..')
+
 from fastquant import get_stock_data
 from hmmlearn import hmm
 import numpy as np
@@ -6,12 +11,10 @@ import matplotlib.pyplot as plt
 import math
 import time
 from multiprocessing import Pool
-import sys
 from model import Model
 from test import *
 
-# lets us use model and test files as imports
-sys.path.append('..')
+
 
 class GmmHMM(Model):
     def __init__(self,params,name):
