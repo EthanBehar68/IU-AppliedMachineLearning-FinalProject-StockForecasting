@@ -118,11 +118,11 @@ class GmmHMM:
 
 if __name__ == "__main__":
     # pull in data
-    train_data_aapl = get_stock_data('AAPL','2003-02-10','2004-09-10')
-    test_data_aapl = get_stock_data('AAPL','2004-09-13','2005-01-21')
+    train_data_aapl = get_stock_data('AAPL','2003-02-10','2004-09-12')
+    test_data_aapl = get_stock_data('AAPL','2004-09-13','2005-01-22')
     
-    train_data_ibm = get_stock_data('IBM','2003-02-10','2004-09-10')
-    test_data_ibm = get_stock_data('IBM','2004-09-13','2005-01-21')
+    train_data_ibm = get_stock_data('IBM','2003-02-10','2004-09-12')
+    test_data_ibm = get_stock_data('IBM','2004-09-13','2005-01-22')
 
 
     # preform grid search to find best model parameters
