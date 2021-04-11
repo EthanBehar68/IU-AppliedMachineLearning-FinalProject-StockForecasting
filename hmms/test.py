@@ -49,9 +49,9 @@ own_tests = {
     },
     'test5': {
         'train':
-            {'ticker':'DPZ', 'start':'2009-01-01', 'end':'2015-01-01'},
+            {'ticker':'DIS', 'start':'2009-01-01', 'end':'2015-01-01'},
         'test':
-            {'ticker':'DPZ', 'start':'2015-01-02', 'end':'2016-01-02'}
+            {'ticker':'DIS', 'start':'2015-01-02', 'end':'2016-01-02'}
     },
     'test6': {
         'train':
