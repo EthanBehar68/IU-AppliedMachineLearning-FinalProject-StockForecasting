@@ -24,7 +24,7 @@ class RNN(Model):
         self.scaler = MinMaxScaler(feature_range=(0,1))
 
         # pull out the close values and scale them
-        train_vals = self.train_data['close'].values
+        train_vals = self.train_data[['close']].values
         train_scale = self.scaler.fit_transform(train_vals)
 
         # build the x as the observation from (O_i,...,O_i+d)
@@ -50,7 +50,7 @@ class RNN(Model):
 
     def predict(self, test_data):
         test_data = self.train_data[-(self.d-1):].append(test_data)
-        test_data = test_data['close'].values
+        test_data = test_data[['close']].values
 
         # scale the test data
         test_scale = self.scaler.transform(test_data)
