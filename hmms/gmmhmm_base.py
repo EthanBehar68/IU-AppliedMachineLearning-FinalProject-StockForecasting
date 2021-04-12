@@ -117,8 +117,8 @@ if __name__ == "__main__":
                     'name':'paper-GMMGMM'}
     print('testing paper parameters paper tests')
     # testing using best params found by grid search
-    test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='paper-gmm-paper-tests.json')
+    test = Test(Model=GmmHMM, params=paper_params, tests=paper_tests, f='paper-gmm-paper-tests.json')
     test.run_tests()
     print('testing paper parameters own tests')
-    test = Test(Model=GmmHMM, params=params, tests=own_tests, f='paper-gmm-own-tests.json')
+    test = Test(Model=GmmHMM, params=paper_params, tests=own_tests, f='paper-gmm-own-tests.json')
     test.run_tests()
