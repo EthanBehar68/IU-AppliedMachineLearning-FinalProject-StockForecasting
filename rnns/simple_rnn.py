@@ -74,7 +74,7 @@ class RNN(Model):
         model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
         model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
         model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(32 activation=self.activation))
+        model.add(SimpleRNN(32, activation=self.activation))
         model.add(Dense(1))
 
         return model
