@@ -101,24 +101,9 @@ if __name__ == "__main__":
               'name':'GMMHMM'}
     
     print('testing best found parameters paper tests')
-    # testing using best params found by grid search
     test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-paper-tests.json')
     test.run_tests()
+
     print('testing best found parameters own tests')
     test = Test(Model=GmmHMM, params=params, tests=own_tests, f='gmm-own-tests.json')
-    test.run_tests()
-
-    # testing using the papers params
-    paper_params = {'n_components': 4,
-                    'n_mix': 5,
-                    'algorithm': 'map',
-                    'n_iter': 100,
-                    'd': 10,
-                    'name':'paper-GMMGMM'}
-    print('testing paper parameters paper tests')
-    # testing using best params found by grid search
-    test = Test(Model=GmmHMM, params=paper_params, tests=paper_tests, f='paper-gmm-paper-tests.json')
-    test.run_tests()
-    print('testing paper parameters own tests')
-    test = Test(Model=GmmHMM, params=paper_params, tests=own_tests, f='paper-gmm-own-tests.json')
     test.run_tests()
