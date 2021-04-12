@@ -62,12 +62,13 @@ own_tests = {
 }
 
 class Test:
-    def __init__(self, Model, params, tests, f):
+    def __init__(self, Model, params, tests, f, plot=False):
         self.Model = Model
         self.params = params
         self.tests = tests
         self.results = {}
         self.f = f
+        self.plot = plot
     
     def run_tests(self):
         for test in self.tests.values():
@@ -96,6 +97,11 @@ class Test:
             error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
 
             self.results[f'{self.model.name}:{ticker}'] = error
+
+            # plot results if flag is set
+            if self.plot:
+                self.model.plot_results(preds=preds, actual=actuals,
+                                        title=f'{self.model.name} {ticker} forcasted vs actual stock prices {testing_params["start"]} to {testing_params["end"]}')
         
         # write errors to file
         dump = json.dumps(self.results)
