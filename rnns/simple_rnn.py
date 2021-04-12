@@ -73,10 +73,10 @@ class RNN(Model):
     
     def gen_model(self):
         model = Sequential()
-        model.add(SimpleRNN(5, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(5, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(5, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(5, activation=self.activation))
+        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(50, activation=self.activation))
         model.add(Dense(1))
 
         return model
@@ -85,10 +85,10 @@ class RNN(Model):
 if __name__ == "__main__":
     params = {'lr': 0.001,
               'loss': 'mean_absolute_percentage_error',
-              'activation': 'tanh',
+              'activation': 'sigmoid',
               'epochs': 200,
-              'batch_size': 50,
-              'd': 10,
+              'batch_size': 150,
+              'd': 45,
               'name': 'SimpleRNN'}
     
     print('paper tests')
