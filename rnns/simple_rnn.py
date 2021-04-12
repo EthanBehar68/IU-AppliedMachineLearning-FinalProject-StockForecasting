@@ -61,7 +61,7 @@ class RNN(Model):
         for i in range(self.d, len(test_scale)):
             x_test.append(test_scale[i-self.d:i,0])
             actual.append(test_data[i,0])
-            
+
         x_test,actual = np.array(x_test),np.array(actual)
         x_test = np.reshape(x_test, (*x_test.shape,1))
 
@@ -73,10 +73,10 @@ class RNN(Model):
     
     def gen_model(self):
         model = Sequential()
-        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(32, activation=self.activation))
+        model.add(SimpleRNN(5, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(5, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(5, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(5, activation=self.activation))
         model.add(Dense(1))
 
         return model
@@ -86,9 +86,9 @@ if __name__ == "__main__":
     params = {'lr': 0.001,
               'loss': 'mean_absolute_percentage_error',
               'activation': 'tanh',
-              'epochs': 100,
-              'batch_size': 150,
-              'd': 60,
+              'epochs': 200,
+              'batch_size': 50,
+              'd': 10,
               'name': 'SimpleRNN'}
     
     print('paper tests')
