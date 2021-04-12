@@ -11,6 +11,7 @@ from test import *
 
 class RNN(Model):
     def __init__(self,params):
+        super().__init__(params)
         self.lr = params['lr']
         self.loss = params['loss']
         self.activation = params['activation']
