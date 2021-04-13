@@ -68,7 +68,8 @@ class RNN(Model):
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
 
-        observed = self.train_obs[-self.d:]
+        observed = np.array([self.train_obs[-self.d:]])
+        print(observed)
 
         preds = []
         print('starting predictions')
