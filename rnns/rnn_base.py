@@ -71,6 +71,7 @@ class RNN(Model):
         observed = self.train_obs[-self.d:]
 
         preds = []
+        print('starting predictions')
 
         for i in range(len(test_data)):
             pred_frac_change = self.model.predict(np.reshape(observed,(*observed.shape,1)))
@@ -79,6 +80,8 @@ class RNN(Model):
 
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close)
+            
+            print(f'{i+1}/{len(test_data)}',end='\r',flush=True)
 
         return preds, test_close_prices
     
@@ -106,7 +109,7 @@ if __name__ == "__main__":
               'loss': 'mean_absolute_percentage_error',
               'activation': 'sigmoid',
               'epochs': 100,
-              'batch_size': 25,
+              'batch_size': 1,
               'd': 5,
               'name': 'SimpleRNN'}
     
