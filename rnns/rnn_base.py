@@ -36,7 +36,6 @@ class RNN(Model):
         
         x_train,y_train = np.array(x_train),np.array(y_train)
         x_train = np.reshape(x_train, (*x_train.shape,1))
-        print(x_train.shape)
 
         # build the model
         self.model = self.gen_model()
