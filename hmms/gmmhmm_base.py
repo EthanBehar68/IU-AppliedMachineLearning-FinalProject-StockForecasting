@@ -29,9 +29,7 @@ class GmmHMM(Model):
 
         self.model.fit(self.train_obs)
     
-    def predict(self,test_data):
-        test_obs = self.data_prep(test_data)
-        
+    def predict(self,test_data):        
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
 
