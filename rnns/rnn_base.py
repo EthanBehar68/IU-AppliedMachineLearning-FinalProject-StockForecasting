@@ -4,8 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
-from keras.layers import Dense, SimpleRNN
-from keras.optimizers import SGD
+from keras.layers import Dense, SimpleRNN, LSTM
+from keras.optimizers import RMSprop
 from model import Model
 from test import *
 
@@ -23,6 +23,9 @@ class RNN(Model):
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
         self.train_obs = self.data_prep(train_data).values
+        self.scaler = MinMaxScaler(feature_range=(0,1))
+        self.scaler = self.scaler.fit(self.train_obs)
+        self.train_obs = self.scaler.transform(self.train_obs)
 
         # build the x as the observation from (O_i,...,O_i+d)
         # y is O_i+d
@@ -33,10 +36,11 @@ class RNN(Model):
         
         x_train,y_train = np.array(x_train),np.array(y_train)
         x_train = np.reshape(x_train, (*x_train.shape,1))
+        print(x_train.shape)
 
         # build the model
         self.model = self.gen_model()
-        self.model.compile(optimizer=SGD(learning_rate=self.lr), loss=self.loss)
+        self.model.compile(optimizer=RMSprop(learning_rate=self.lr), loss=self.loss)
         
         # train the model
         self.model.fit(x=x_train, 
@@ -46,79 +50,60 @@ class RNN(Model):
                        verbose=1)
 
     def predict(self, test_data):
-        # test_data = self.train_data[-(self.d-1):].append(test_data)
-        # test_data = test_data[['close']].values
-
-        # # scale the test data
-        # test_scale = self.scaler.transform(test_data)
-
-        # # build observations like in training
-        # x_test,actual = [],[]
-        # for i in range(self.d, len(test_scale)):
-        #     x_test.append(test_scale[i-self.d:i,0])
-        #     actual.append(test_data[i,0])
-
-        # x_test,actual = np.array(x_test),np.array(actual)
-        # x_test = np.reshape(x_test, (*x_test.shape,1))
-
-        # # predict the points
-        # preds = self.model.predict(x_test)
-        # preds = self.scaler.inverse_transform(preds)
-
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
 
-        observed = np.array([self.train_obs[-self.d:]])
-        print(observed)
+        observed = self.train_obs[-self.d:]
 
         preds = []
         print('starting predictions')
 
         for i in range(len(test_data)):
-            pred_frac_change = self.model.predict(observed)
-            print(pred_frac_change.shape)
+            pred_frac_change = self.model.predict(observed.reshape(1,self.d,1))
             observed = np.vstack((observed,pred_frac_change))
             observed = observed[1:]
 
+            pred_frac_change = self.scaler.inverse_transform(pred_frac_change)
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
-            preds.append(pred_close)
+            preds.append(pred_close.reshape(1,))
             
             print(f'{i+1}/{len(test_data)}',end='\r',flush=True)
 
+        print(preds)
         return preds, test_close_prices
     
     def data_prep(self, data):
-        df = pd.DataFrame(data=None, columns=['fracChange','fracHigh','fracLow'])
+        df = pd.DataFrame(data=None, columns=['fracChange'])
         df['fracChange'] = (data['close']-data['open'])/data['open']
-        df['fracHigh'] = (data['high']-data['open'])/data['open']
-        df['fracLow'] = (data['open']-data['low'])/data['open']
 
         return df
 
     def gen_model(self):
         model = Sequential()
-        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(32, activation=self.activation))
-        model.add(Dense(3))
+        model.add(LSTM(50, return_sequences=True))
+        model.add(LSTM(50, return_sequences=True))
+        model.add(LSTM(50, return_sequences=True))
+        model.add(LSTM(50, return_sequences=True))
+        model.add(LSTM(50, return_sequences=True))
+        model.add(LSTM(50))
+        model.add(Dense(1))
 
         return model
 
 
 if __name__ == "__main__":
     params = {'lr': 0.01,
-              'loss': 'mean_absolute_percentage_error',
-              'activation': 'sigmoid',
-              'epochs': 100,
+              'loss': 'mean_squared_error',
+              'activation': 'tanh',
+              'epochs': 300,
               'batch_size': 150,
-              'd': 5,
-              'name': 'SimpleRNN'}
+              'd': 10,
+              'name': 'RNN-LSTM'}
     
     print('paper tests')
-    test = Test(Model=RNN, params=params, tests=paper_tests, f='rnn-paper-tests.json', plot=True)
+    test = Test(Model=RNN, params=params, tests=paper_tests, f='rnn-lstm-paper-tests.json', plot=True)
     test.run_tests()
 
     print('own tests')
-    test = Test(Model=RNN, params=params, tests=own_tests, f='rnn-own-tests.json', plot=True)
+    test = Test(Model=RNN, params=params, tests=own_tests, f='rnn-lstm-own-tests.json', plot=True)
     test.run_tests()
