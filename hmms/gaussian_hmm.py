@@ -78,7 +78,7 @@ class GHMM(Model):
         return log_liks
     
     def data_prep(self, data):
-        df = pd.DataFrame(data=None, columns=['fracChange','fracHigh','fracLow'])
+        df = pd.DataFrame(data=None, columns=['fracChange'])
         df['fracChange'] = (data['close']-data['open'])/data['open']
 
         return df
