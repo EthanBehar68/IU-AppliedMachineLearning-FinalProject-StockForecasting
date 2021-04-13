@@ -88,15 +88,16 @@ class RNNModel(Model):
 if __name__ == "__main__":
     params = {'lr': 0.001,
               'loss': 'mean_squared_error',
+              'activation': 'tanh',
               'epochs': 100,
               'batch_size': 150,
               'd': 10,
-              'name': 'RNN'}
+              'name': 'RNN-base'}
     
     print('paper tests')
-    test = Test(Model=RNNModel, params=params, tests=paper_tests, f='rnn-paper-tests.json', plot=True)
+    test = Test(Model=RNNModel, params=params, tests=paper_tests, f='rnn-base-paper-tests.json', plot=True)
     test.run_tests()
 
     print('own tests')
-    test = Test(Model=RNNModel, params=params, tests=own_tests, f='rnn-own-tests.json', plot=True)
+    test = Test(Model=RNNModel, params=params, tests=own_tests, f='rnn-base-own-tests.json', plot=True)
     test.run_tests()

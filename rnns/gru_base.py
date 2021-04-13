@@ -88,15 +88,16 @@ class GRUModel(Model):
 if __name__ == "__main__":
     params = {'lr': 0.001,
               'loss': 'mean_squared_error',
+              'activation': 'tanh',
               'epochs': 100,
               'batch_size': 150,
               'd': 10,
-              'name': 'GRU'}
+              'name': 'GRU-base'}
     
     print('paper tests')
-    test = Test(Model=GRUModel, params=params, tests=paper_tests, f='gru-paper-tests.json', plot=True)
+    test = Test(Model=GRUModel, params=params, tests=paper_tests, f='gru-base-paper-tests.json', plot=True)
     test.run_tests()
 
     print('own tests')
-    test = Test(Model=GRUModel, params=params, tests=own_tests, f='gru-own-tests.json', plot=True)
+    test = Test(Model=GRUModel, params=params, tests=own_tests, f='gru-base-own-tests.json', plot=True)
     test.run_tests()

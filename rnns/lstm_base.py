@@ -92,12 +92,12 @@ if __name__ == "__main__":
               'epochs': 100,
               'batch_size': 150,
               'd': 10,
-              'name': 'LSTM'}
+              'name': 'LSTM-base'}
     
     print('paper tests')
-    test = Test(Model=LSTMModel, params=params, tests=paper_tests, f='lstm-paper-tests.json', plot=True)
+    test = Test(Model=LSTMModel, params=params, tests=paper_tests, f='lstm-base-paper-tests.json', plot=True)
     test.run_tests()
 
     print('own tests')
-    test = Test(Model=LSTMModel, params=params, tests=own_tests, f='lstm-own-tests.json', plot=True)
+    test = Test(Model=LSTMModel, params=params, tests=own_tests, f='lstm-base-own-tests.json', plot=True)
     test.run_tests()
