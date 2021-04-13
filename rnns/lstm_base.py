@@ -15,6 +15,7 @@ class LSTMModel(Model):
         self.lr = params['lr']
         self.loss = params['loss']
         self.activation = params['activation']
+        self.recurrent_activation = params['recurrent_activation']
         self.epochs = params['epochs']
         self.batch_size = params['batch_size']
         self.d = params['d']
@@ -77,9 +78,9 @@ class LSTMModel(Model):
 
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(50, return_sequences=True))
-        model.add(LSTM(50, return_sequences=True))
-        model.add(LSTM(50))
+        model.add(LSTM(50,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(50,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(50,activation=self.activation,recurrent_activation=self.recurrent_activation))
         model.add(Dense(1))
 
         return model
@@ -89,6 +90,7 @@ if __name__ == "__main__":
     params = {'lr': 0.001,
               'loss': 'mean_squared_error',
               'activation': 'tanh',
+              'recurrent_activation': 'sigmoid',
               'epochs': 100,
               'batch_size': 150,
               'd': 10,

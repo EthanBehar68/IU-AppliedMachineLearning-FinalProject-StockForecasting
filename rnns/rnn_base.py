@@ -77,9 +77,9 @@ class RNNModel(Model):
 
     def gen_model(self):
         model = Sequential()
-        model.add(SimpleRNN(50, return_sequences=True))
-        model.add(SimpleRNN(50, return_sequences=True))
-        model.add(SimpleRNN(50))
+        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(50, activation=self.activation))
         model.add(Dense(1))
 
         return model
