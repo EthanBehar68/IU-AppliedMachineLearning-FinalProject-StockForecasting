@@ -89,12 +89,12 @@ if __name__ == "__main__":
               'algorithm': 'map', 
               'n_iter': 100, 
               'd': 5,
-              'name':'GHMM'}
+              'name':'GHMM3'}
     
     print('testing best found parameters paper tests')
-    test = Test(Model=GHMM, params=params, tests=paper_tests, f='ghmm-paper-tests.json', plot=False)
+    test = Test(Model=GHMM, params=params, tests=paper_tests, f='ghmm3-paper-tests.json', plot=False)
     test.run_tests()
 
     print('testing best found parameters own tests')
-    test = Test(Model=GHMM, params=params, tests=own_tests, f='ghmm-own-tests.json', plot=False)
+    test = Test(Model=GHMM, params=params, tests=own_tests, f='ghmm3-own-tests.json', plot=False)
     test.run_tests()
