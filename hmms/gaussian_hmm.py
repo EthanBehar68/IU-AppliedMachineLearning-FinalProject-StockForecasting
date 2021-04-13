@@ -40,7 +40,7 @@ class GHMM(Model):
         # loop through all points we want to test
         for i in range(len(test_data)):
             # try 50x10x10 possible values for O_d+1
-            change = np.arange(-0.2,0.2,0.4/6000)
+            change = np.arange(-0.2,0.2,0.4/5000)
 
             observations = [np.array([c]) for c in change]
             
@@ -85,16 +85,16 @@ class GHMM(Model):
 
 
 if __name__ == "__main__":
-    params = {'n_components': 3, 
+    params = {'n_components': 2, 
               'algorithm': 'map', 
               'n_iter': 100, 
               'd': 5,
-              'name':'GHMM3'}
+              'name':'GHMM'}
     
     print('testing best found parameters paper tests')
-    test = Test(Model=GHMM, params=params, tests=paper_tests, f='ghmm3-paper-tests.json', plot=False)
+    test = Test(Model=GHMM, params=params, tests=paper_tests, f='ghmm-paper-tests.json', plot=False)
     test.run_tests()
 
     print('testing best found parameters own tests')
-    test = Test(Model=GHMM, params=params, tests=own_tests, f='ghmm3-own-tests.json', plot=False)
+    test = Test(Model=GHMM, params=params, tests=own_tests, f='ghmm-own-tests.json', plot=False)
     test.run_tests()
