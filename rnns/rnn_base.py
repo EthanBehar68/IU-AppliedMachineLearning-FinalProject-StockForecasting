@@ -9,7 +9,7 @@ from keras.optimizers import RMSprop
 from model import Model
 from test import *
 
-class RNN(Model):
+class RNNModel(Model):
     def __init__(self,params):
         super().__init__(params)
         self.lr = params['lr']
