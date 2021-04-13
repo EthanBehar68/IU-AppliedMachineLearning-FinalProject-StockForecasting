@@ -43,7 +43,7 @@ class RNN(Model):
                        y=y_train, 
                        epochs=self.epochs, 
                        batch_size=self.batch_size,
-                       verbose=0)
+                       verbose=1)
 
     def predict(self, test_data):
         # test_data = self.train_data[-(self.d-1):].append(test_data)
