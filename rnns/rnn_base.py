@@ -92,7 +92,7 @@ class RNN(Model):
 
 
 if __name__ == "__main__":
-    params = {'lr': 0.01,
+    params = {'lr': 0.001,
               'loss': 'mean_squared_error',
               'activation': 'tanh',
               'epochs': 300,
