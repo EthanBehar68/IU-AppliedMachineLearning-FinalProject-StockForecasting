@@ -105,7 +105,7 @@ class RNN(Model):
 
 
 if __name__ == "__main__":
-    params = {'lr': 0.001,
+    params = {'lr': 0.01,
               'loss': 'mean_absolute_percentage_error',
               'activation': 'sigmoid',
               'epochs': 100,
