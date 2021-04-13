@@ -68,7 +68,7 @@ class RNN(Model):
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
 
-        observed = self.train_obs[-self.d:].values
+        observed = self.train_obs[-self.d:]
 
         preds = []
 
@@ -93,10 +93,10 @@ class RNN(Model):
 
     def gen_model(self):
         model = Sequential()
-        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(50, return_sequences=True, activation=self.activation))
-        model.add(SimpleRNN(50, activation=self.activation))
+        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(32, return_sequences=True, activation=self.activation))
+        model.add(SimpleRNN(32, activation=self.activation))
         model.add(Dense(1))
 
         return model
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     params = {'lr': 0.001,
               'loss': 'mean_absolute_percentage_error',
               'activation': 'sigmoid',
-              'epochs': 200,
+              'epochs': 100,
               'batch_size': 1,
               'd': 5,
               'name': 'SimpleRNN'}
