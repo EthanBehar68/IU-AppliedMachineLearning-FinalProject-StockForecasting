@@ -75,7 +75,7 @@ class RNN(Model):
         print('starting predictions')
 
         for i in range(len(test_data)):
-            pred_frac_change = self.model.predict(np.reshape(observed,(*observed.shape,1)))
+            pred_frac_change = self.model.predict(observed)
             print(pred_frac_change.shape)
             observed = np.vstack((observed,pred_frac_change))
             observed = observed[1:]
