@@ -70,7 +70,7 @@ class Test:
         self.f = f
         self.plot = plot
     
-    def run_tests(self):
+    def fixed_origin_tests(self):
         for test in self.tests.values():
             training_params = test['train']
             testing_params = test['test']
