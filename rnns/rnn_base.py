@@ -22,7 +22,7 @@ class RNN(Model):
 
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
-        self.train_obs = self.data_prep(train_data)
+        self.train_obs = self.data_prep(train_data).values
 
         # build the x as the observation from (O_i,...,O_i+d)
         # y is O_i+d
