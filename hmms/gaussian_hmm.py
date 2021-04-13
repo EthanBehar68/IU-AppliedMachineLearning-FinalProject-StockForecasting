@@ -93,8 +93,8 @@ if __name__ == "__main__":
     
     print('testing best found parameters paper tests')
     test = Test(Model=GHMM, params=params, tests=paper_tests, f='ghmm-paper-tests.json', plot=True)
-    test.run_tests()
+    test.fixed_origin_tests()
 
     print('testing best found parameters own tests')
     test = Test(Model=GHMM, params=params, tests=own_tests, f='ghmm-own-tests.json', plot=True)
-    test.run_tests()
+    test.fixed_origin_tests()

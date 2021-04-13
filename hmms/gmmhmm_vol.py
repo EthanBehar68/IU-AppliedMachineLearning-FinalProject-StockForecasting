@@ -105,8 +105,8 @@ if __name__ == "__main__":
     
     print('testing best found parameters paper tests')
     test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-vol-paper-tests.json')
-    test.run_tests()
+    test.fixed_origin_tests()
 
     print('testing best found parameters own tests')
     test = Test(Model=GmmHMM, params=params, tests=own_tests, f='gmm-vol-own-tests.json')
-    test.run_tests()
+    test.fixed_origin_tests()
