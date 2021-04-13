@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, SimpleRNN
-from keras.optimizers import RMSprop
+from keras.optimizers import SGD
 from model import Model
 from test import *
 
@@ -36,7 +36,7 @@ class RNN(Model):
 
         # build the model
         self.model = self.gen_model()
-        self.model.compile(optimizer=RMSprop(learning_rate=self.lr), loss=self.loss)
+        self.model.compile(optimizer=SGD(learning_rate=self.lr), loss=self.loss)
         
         # train the model
         self.model.fit(x=x_train, 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
               'loss': 'mean_absolute_percentage_error',
               'activation': 'sigmoid',
               'epochs': 100,
-              'batch_size': 1,
+              'batch_size': 10,
               'd': 5,
               'name': 'SimpleRNN'}
     
