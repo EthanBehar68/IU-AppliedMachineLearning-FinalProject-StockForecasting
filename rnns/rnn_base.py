@@ -78,7 +78,6 @@ class RNN(Model):
             print(pred_frac_change.shape)
             observed = np.vstack((observed,pred_frac_change))
             observed = observed[1:]
-            print(observed.shape)
 
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close)
