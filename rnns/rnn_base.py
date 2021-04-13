@@ -92,7 +92,7 @@ if __name__ == "__main__":
     params = {'lr': 0.01,
               'loss': 'mean_squared_error',
               'activation': 'tanh',
-              'epochs': 300,
+              'epochs': 100,
               'batch_size': 150,
               'd': 10,
               'name': 'RNN-LSTM'}
