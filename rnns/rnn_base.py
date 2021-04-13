@@ -56,7 +56,6 @@ class RNN(Model):
         observed = self.train_obs[-self.d:]
 
         preds = []
-        print('starting predictions')
 
         for i in range(len(test_data)):
             pred_frac_change = self.model.predict(observed.reshape(1,self.d,1))
@@ -69,8 +68,7 @@ class RNN(Model):
             
             print(f'{i+1}/{len(test_data)}',end='\r',flush=True)
 
-        print(preds)
-        return preds, test_close_prices
+        return np.array(preds).flatten(), test_close_prices
     
     def data_prep(self, data):
         df = pd.DataFrame(data=None, columns=['fracChange'])
