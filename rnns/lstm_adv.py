@@ -77,19 +77,14 @@ class LSTMModel(Model):
 
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(50, return_sequences=True, activation=self.activation))
+        model.add(LSTM(75, return_sequences=True))
         model.add(Dropout(rate=0.1))
-        model.add(LSTM(50, return_sequences=True, activation=self.activation))
+        model.add(LSTM(75, return_sequences=True))
         model.add(Dropout(rate=0.1))
-        model.add(LSTM(50, return_sequences=True, activation=self.activation))
+        model.add(LSTM(75, return_sequences=True))
         model.add(Dropout(rate=0.1))
-        model.add(LSTM(50, return_sequences=True, activation=self.activation))
-        model.add(Dropout(rate=0.1))
-        model.add(LSTM(50, return_sequences=True, activation=self.activation))
-        model.add(Dropout(rate=0.1))
-        model.add(LSTM(50, activation=self.activation))
+        model.add(LSTM(75))
         model.add(Dense(1))
-
         return model
 
 
@@ -99,7 +94,7 @@ if __name__ == "__main__":
               'activation': 'elu',
               'epochs': 100,
               'batch_size': 150,
-              'd': 25,
+              'd': 5,
               'name': 'LSTM-adv'}
     
     print('paper tests')
