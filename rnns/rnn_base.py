@@ -75,6 +75,7 @@ class RNN(Model):
 
         for i in range(len(test_data)):
             pred_frac_change = self.model.predict(np.reshape(observed,(*observed.shape,1)))
+            print(pred_frac_change.shape)
             observed = np.vstack((observed,pred_frac_change))
             observed = observed[1:]
             print(observed.shape)
@@ -110,7 +111,7 @@ if __name__ == "__main__":
               'loss': 'mean_absolute_percentage_error',
               'activation': 'sigmoid',
               'epochs': 100,
-              'batch_size': 10,
+              'batch_size': 150,
               'd': 5,
               'name': 'SimpleRNN'}
     
