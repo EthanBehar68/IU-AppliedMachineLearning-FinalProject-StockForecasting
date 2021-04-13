@@ -96,8 +96,8 @@ if __name__ == "__main__":
     
     print('paper tests')
     test = Test(Model=RNNModel, params=params, tests=paper_tests, f='rnn-base-paper-tests.json', plot=True)
-    test.run_tests()
+    test.fixed_origin_tests()
 
     print('own tests')
     test = Test(Model=RNNModel, params=params, tests=own_tests, f='rnn-base-own-tests.json', plot=True)
-    test.run_tests()
+    test.fixed_origin_tests()

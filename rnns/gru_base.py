@@ -98,8 +98,8 @@ if __name__ == "__main__":
     
     print('paper tests')
     test = Test(Model=GRUModel, params=params, tests=paper_tests, f='gru-base-paper-tests.json', plot=True)
-    test.run_tests()
+    test.fixed_origin_tests()
 
     print('own tests')
     test = Test(Model=GRUModel, params=params, tests=own_tests, f='gru-base-own-tests.json', plot=True)
-    test.run_tests()
+    test.fixed_origin_tests()
