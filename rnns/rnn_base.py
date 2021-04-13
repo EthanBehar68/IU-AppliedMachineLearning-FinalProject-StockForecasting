@@ -82,9 +82,6 @@ class RNN(Model):
         model = Sequential()
         model.add(LSTM(50, return_sequences=True))
         model.add(LSTM(50, return_sequences=True))
-        model.add(LSTM(50, return_sequences=True))
-        model.add(LSTM(50, return_sequences=True))
-        model.add(LSTM(50, return_sequences=True))
         model.add(LSTM(50))
         model.add(Dense(1))
 
