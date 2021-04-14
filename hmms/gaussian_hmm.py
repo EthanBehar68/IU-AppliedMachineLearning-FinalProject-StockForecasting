@@ -101,4 +101,4 @@ if __name__ == "__main__":
 
     print('testing')
     test = Test(Model=GHMM, params=params, tests=rolling_window_tests, f='ghmm-rolling-tests.json', plot=True)
-    test.rolling_window_tests()
+    test.rolling_window_test()
