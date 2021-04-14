@@ -36,7 +36,7 @@ class Model(ABC):
         plt.savefig(f'../imgs/{title}.png')
     
     # plotting function for training data + prediction + actual
-    def plot_continuos(self, preds, train, actual, title):
+    def plot_continuous(self, preds, train, actual, title):
         last_50 = train['close'].values[-50:]
         last = np.append(last_50, actual[0])
         fig, ax = plt.subplots(figsize=(15,5))
