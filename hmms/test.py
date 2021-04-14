@@ -61,6 +61,33 @@ own_tests = {
     }
 }
 
+rolling_window_tests = {
+    'test1': {
+        'window':
+            {'ticker':'AMZN', 'start':'2015-01-01', 'end':'2020-01-01'},
+    },
+    'test2': {
+        'window':
+            {'ticker':'MSFT', 'start':'2015-01-01', 'end':'2020-01-01'},
+    },
+    'test3': {
+        'window':
+            {'ticker':'GOOGL', 'start':'2015-01-01', 'end':'2020-01-01'},
+    },
+    'test4': {
+        'window':
+            {'ticker':'DPZ', 'start':'2015-01-01', 'end':'2020-01-01'},
+    },
+    'test5': {
+        'window':
+            {'ticker':'DIS', 'start':'2015-01-01', 'end':'2020-01-01'},
+    },
+    'test6': {
+        'window':
+            {'ticker':'TMO', 'start':'2015-01-01', 'end':'2020-01-01'},
+    }
+}
+
 class Test:
     def __init__(self, Model, params, tests, f, plot=False):
         self.Model = Model
@@ -108,3 +135,61 @@ class Test:
         output_file = open(self.f, 'w')
         output_file.write(dump)
         output_file.close()
+
+    def rolling_window_test(self):
+        # train on 1155 points, test on 10 points
+        # slide window over by testing_size each time to get 10 tests
+        training_size = 1155
+        testing_size = 10
+
+        for test in self.tests.values():
+            # var to store error and test num
+            error = 0
+            test_n = 0
+
+            # collect the data for the window
+            window_params = test['window']
+            ticker = window_params['ticker']
+
+            window = self.model.get_data(ticker=ticker,
+                                         start_date=window_params['start'],
+                                         end_date=window_params['end'])
+
+            # 10 tests within the window
+            for i in range(0,100,10):
+                train_data = window.iloc[i:i+training_size]
+                test_data = window.iloc[i+training_size:i+training_size+testing_size]
+
+                print(f'window {i+1}')
+
+                # train and predict
+                self.model.train(train_data=train_data)
+                preds, actuals = self.model.predict(test_data=test_data)
+
+                # get error for this window
+                error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                test_n += 1
+
+                print('DONE')
+            
+            # store average MAPE error
+            avg_error = error/test_n
+            self.results[f'{self.model.name}:{ticker}'] = avg_error
+        
+        # write errors to file
+        dump = json.dumps(self.results)
+        output_file = open(self.f, 'w')
+        output_file.write(dump)
+        output_file.close()
+
+if __name__ == "__main__":
+    test = rolling_window_tests['test6']['window']
+    df = get_stock_data(test['ticker'],test['start'],test['end'])
+    print('df')
+    print(df)
+    for i in range(0,100,10):
+        train = df.iloc[i:i+1155]
+        test = df.iloc[i+1155:i+1155+10]
+        print(i)
+        print(train)
+        print(test)
