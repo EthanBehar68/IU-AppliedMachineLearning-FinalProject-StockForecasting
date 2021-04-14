@@ -162,6 +162,9 @@ class Test:
 
                 print(f'window {i+1}')
 
+                # make the model
+                self.model = self.Model(params=self.params)
+
                 # train and predict
                 self.model.train(train_data=train_data)
                 preds, actuals = self.model.predict(test_data=test_data)
@@ -171,6 +174,11 @@ class Test:
                 test_n += 1
 
                 print('DONE')
+            
+            # use last window for plotting
+            if self.plot:
+                self.model.plot_continuous(preds=preds, train=train_data, actual=actuals,
+                                          title=f'{self.model.name} {ticker} forecasted vs actual continuous stock price')
             
             # store average MAPE error
             avg_error = error/test_n
