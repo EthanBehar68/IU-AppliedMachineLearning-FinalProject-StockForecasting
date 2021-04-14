@@ -96,10 +96,14 @@ if __name__ == "__main__":
               'd': 10,
               'name': 'GRU-base'}
     
-    print('paper tests')
-    test = Test(Model=GRUModel, params=params, tests=paper_tests, f='gru-base-paper-tests.json', plot=True)
-    test.fixed_origin_tests()
+    # print('paper tests')
+    # test = Test(Model=GRUModel, params=params, tests=paper_tests, f='gru-base-paper-tests.json', plot=True)
+    # test.fixed_origin_tests()
 
-    print('own tests')
-    test = Test(Model=GRUModel, params=params, tests=own_tests, f='gru-base-own-tests.json', plot=True)
-    test.fixed_origin_tests()
+    # print('own tests')
+    # test = Test(Model=GRUModel, params=params, tests=own_tests, f='gru-base-own-tests.json', plot=True)
+    # test.fixed_origin_tests()
+
+    print('testing')
+    test = Test(Model=GRUModel, params=params, tests=rolling_window_tests, f='gru-rolling-tests.json', plot=True)
+    test.rolling_window_test()

@@ -98,10 +98,14 @@ if __name__ == "__main__":
               'd': 5,
               'name':'GMMHMM'}
     
-    print('testing best found parameters paper tests')
-    test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-paper-tests.json', plot=True)
-    test.fixed_origin_tests()
+    # print('testing best found parameters paper tests')
+    # test = Test(Model=GmmHMM, params=params, tests=paper_tests, f='gmm-paper-tests.json', plot=True)
+    # test.fixed_origin_tests()
 
-    print('testing best found parameters own tests')
-    test = Test(Model=GmmHMM, params=params, tests=own_tests, f='gmm-own-tests.json', plot=True)
-    test.fixed_origin_tests()
+    # print('testing best found parameters own tests')
+    # test = Test(Model=GmmHMM, params=params, tests=own_tests, f='gmm-own-tests.json', plot=True)
+    # test.fixed_origin_tests()
+
+    print('testing')
+    test = Test(Model=GmmHMM, params=params, tests=rolling_window_tests, f='gmmhmm-rolling-tests.json', plot=True)
+    test.rolling_window_test()
