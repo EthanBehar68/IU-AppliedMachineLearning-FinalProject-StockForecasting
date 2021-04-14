@@ -34,6 +34,26 @@ class Model(ABC):
         ax.yaxis.grid(True,ls='--')
         ax.legend()
         plt.savefig(f'../imgs/{title}.png')
+    
+    # plotting function for training data + prediction + actual
+    def plot_continuos(self, preds, train, actual, title):
+        last_50 = train['close'].values[-50:]
+        last = np.append(last_50, actual[0])
+        fig, ax = plt.subplots(figsize=(15,5))
+        ax.set_title(title)
+        pred_time = range(len(last_50),len(last_50)+len(preds))
+        train_time = range(0,len(last_50)+1)
+        ax.plot(pred_time,preds,color='tab:red',marker='s',markersize=2,linestyle='-',linewidth=1,label='forcast')
+        ax.plot(train_time,last,color='tab:blue',marker='s',markersize=2,linestyle='-',linewidth=1,label='actual')
+        ax.plot(pred_time,actual,color='tab:blue',marker='s',markersize=2,linestyle='-',linewidth=1)
+        ax.set_xlabel('time')
+        ax.set_ylabel('stock price ($)')
+        ax.set_xticks(np.arange(0,len(pred_time)+len(last_50)+10,10))
+        ax.set_xlim(0,len(pred_time)+len(last_50)+10)
+        ax.xaxis.grid(True,ls='--')
+        ax.yaxis.grid(True,ls='--')
+        ax.legend()
+        plt.savefig(f'../imgs/{title}.png')
 
     # function to get error of the model based on preds and true values
     def mean_abs_percent_error(self, y_pred, y_true):
