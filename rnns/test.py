@@ -151,9 +151,7 @@ class Test:
             window_params = test['window']
             ticker = window_params['ticker']
 
-            window = self.model.get_data(ticker=ticker,
-                                         start_date=window_params['start'],
-                                         end_date=window_params['end'])
+            window = get_stock_data(ticker,window_params['start'],window_params['end'])
 
             # 10 tests within the window
             for i in range(0,100,10):
