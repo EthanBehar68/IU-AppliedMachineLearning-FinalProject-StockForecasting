@@ -1,3 +1,5 @@
+# ignore API tokens
+tokens.txt
 # vscode junk
 .vscode
 # ignore venvs
