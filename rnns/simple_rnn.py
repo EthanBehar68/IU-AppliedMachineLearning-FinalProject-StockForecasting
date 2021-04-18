@@ -91,10 +91,6 @@ if __name__ == "__main__":
               'd': 45,
               'name': 'SimpleRNN'}
     
-    print('paper tests')
-    test = Test(Model=RNN, params=params, tests=paper_tests, f='rnn-paper-tests.json', plot=True)
-    test.run_tests()
-
-    print('own tests')
-    test = Test(Model=RNN, params=params, tests=own_tests, f='rnn-own-tests.json', plot=True)
+    print('tests')
+    test = Test(Model=RNN, params=params, tests=rolling_window_tests, f='rnn-forecast-tests.json', plot=True)
     test.run_tests()
