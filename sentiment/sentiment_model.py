@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 import time
+from datetime import datetime, timedelta
 
 class SentimentModel():
     def __init__(self, params):
@@ -21,23 +22,17 @@ class SentimentModel():
         #       days sentiment and the next days fractional change...
 
         # start and end date used for generating the training data
-        self.start_date = self.tweets.iloc[-1]['date']
-        self.end_date = self.tweets.iloc[0]['date']
+        self.start_date = min(self.tweets['date'])
+        self.end_date = max(self.tweets['date'])
 
         # unique dates needed for the average sentiment calculation
-        self.dates = self.tweets['date'].unique()
+        self.dates = sorted(self.tweets['date'].unique())
 
-        # I have no idea how a nan,aapl,gme, and pltr ended up as dates in the csv...
-        # this is really poorly hardcoded... should change this...
-        self.dates = [d for d in self.dates if type(d)==str and d[0]=='2']
+        # ignore the last date since we have no stock for 'next day' (twitter scrapes live)
+        self.dates = self.dates[:-1]
 
         # we need all tickers from the tweets data set to create the training data
         self.tickers = self.tweets['ticker'].unique()
-        
-        # again idk how a nan found its way into the ticker column in the csv...
-        # this is really poorly hacked together also... not sure where the data
-        # corruption is coming from
-        self.tickers = [t for t in self.tickers if type(t)==str]
         
         # build the training data set using dates and tickers
         self.train_data = pd.DataFrame(data=None, columns=['fracChange','avgSent','ticker'])
@@ -59,7 +54,8 @@ class SentimentModel():
         #       we will need to pull observations from some testing date set. In reality this model
         #       is like the others used for just next day prediction... again in the future with more
         #       data we could possibly use multiple previous days of sentiment to predict the next day
-        test_data = get_stock_data(self.ticker, self.start_date, self.end_date)
+        #       we have to add 1 day since fastquant is not inclusive of the end date
+        test_data = get_stock_data(self.ticker, self.start_date, self.end_date+timedelta(days=1))
         
         # again we ignore the first day, since we dont have the day before its sentiment
         test_data = test_data[1:]
@@ -80,7 +76,7 @@ class SentimentModel():
             pred_close = pred_frac_change[0]*opens[i]+opens[i]
             preds.append(pred_close)
         
-        return preds,actual
+        return np.array(preds).flatten(),actual
     
     # plotting function for standardized plot results
     def plot_results(self, preds, actual, title):
@@ -108,7 +104,7 @@ class SentimentModel():
         ticker_data = self.tweets[self.tweets['ticker']==ticker]
 
         # collect the stock price data for the given ticker from date range
-        ticker_price_data = get_stock_data(ticker,self.start_date,self.end_date)
+        ticker_price_data = get_stock_data(ticker,self.start_date,self.end_date+timedelta(days=1))
 
         # convert data to fractional change
         ticker_frac_change = self.data_prep(ticker_price_data)
@@ -118,11 +114,6 @@ class SentimentModel():
         
         # calculate the average sentiment over unique dates
         avg_sent = [self.calc_avg_sentiment(ticker,date) for date in self.dates]
-
-        # reverse the list since ticker dates are increaseing, and tweets are decreasing
-        # TODO: using only the first 3 is hardcoded from the way the tweets were scraped
-        #       need to figure this out... avoid weekends but keep sundays...
-        avg_sent = list(reversed(avg_sent))[:4]
         
         # create cols in the data frame for the average sentiment and the ticker
         ticker_frac_change['avgSent'] = avg_sent
@@ -134,12 +125,21 @@ class SentimentModel():
     def read_data(self, f):
         tweets = pd.read_csv(f)
         tweets.drop(columns=['Unnamed: 0'], inplace=True)
-
-        # exclude game stop for now... its got some really bad trends...
-        # this is not data bias, its just not a good stock to look at in 2021
-        # there are way to many factors, and its way to volatile
-        tweets = tweets[tweets['ticker'] != 'gme']
         
+        # drop NA and reset the index
+        tweets = tweets.dropna()
+        tweets.reset_index(inplace=True)
+        tweets.drop(columns=['index'],inplace=True)
+
+        # make the dates actual date objects so we can use min/max
+        tweets['date'] = tweets['date'].apply(lambda date: datetime.strptime(date,'%Y-%m-%d'))
+
+        # drop fridays and saturdays from the data (remove unnecessary cols after)
+        tweets['day'] = tweets['date'].apply(lambda date: date.weekday())
+        tweets = tweets[(tweets['day']!=4)&(tweets['day']!=5)]
+        tweets.reset_index(inplace=True)
+        tweets.drop(columns=['index', 'day'], inplace=True)
+
         return tweets
 
     # helper function to create fractional change data
@@ -159,16 +159,17 @@ class SentimentModel():
         return avg_sentiment
 
 if __name__ == "__main__":
-    params = {'tweets_file': 'tweets.csv',
-              'ticker': 'AMZN'}
-    
-    model = SentimentModel(params=params)
+    for ticker in ['AMZN','AAPL','TSLA','PLTR']:
+        params = {'tweets_file': 'tweets.csv',
+                'ticker': f'{ticker}'}
+        
+        model = SentimentModel(params=params)
 
-    model.train()
-    preds,actual = model.predict()
-    
-    model.plot_results(preds=preds,actual=actual,
-                       title=f'Sentiment Model AMZN forcasted vs actual stock prices 2021-04-13 to 2021-04-16')
-    
-    error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
-    print(error)
+        model.train()
+        preds,actual = model.predict()
+        
+        model.plot_results(preds=preds,actual=actual,
+                        title=f'SentimentModel {ticker} forcasted vs actual stock prices 2021-04-13 to 2021-04-19')
+        
+        error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
+        print(f'{ticker}: {error}')
