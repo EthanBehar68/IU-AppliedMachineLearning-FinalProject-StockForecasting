@@ -107,7 +107,7 @@ if __name__ == "__main__":
         token = f.read()
         token = token.strip('\n')
 
-    tickers = ['tsla', 'amzn', 'msft', 'aapl', 'gme', 'pltr']
+    tickers = ['tsla', 'amzn', 'msft', 'aapl', 'ibm', 'pltr', 'googl', 'dpz', 'dis', 'tmo']
 
     for ticker in tickers:
         collector = TweetCollector(token=token, ticker=ticker)
