@@ -149,8 +149,7 @@ class SentimentModel():
 
         return df
     
-    # helper function to get average sentimate for a given ticker and date
-    # within the loaded tweets data frame
+    # helper function to get average sentimate for a given ticker and date within the loaded tweets data frame
     def calc_avg_sentiment(self,ticker,date):
         df = self.tweets[(self.tweets['ticker']==ticker) & (self.tweets['date']==date)]
         sentiment = df['sentiment'].values
