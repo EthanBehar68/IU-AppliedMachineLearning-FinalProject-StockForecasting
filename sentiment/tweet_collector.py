@@ -65,7 +65,9 @@ class TweetCollector:
             for tweet in response.json()['data']:
                 tweets = tweets.append(self.format_tweet(tweet), ignore_index=True)
 
+        # put dates in form yyy-mm-dd
         tweets['date'] = tweets['date'].apply(self.convert_date)
+
         return tweets
 
     def format_tweet(self, tweet):
@@ -107,7 +109,7 @@ if __name__ == "__main__":
         token = f.read()
         token = token.strip('\n')
 
-    tickers = ['tsla', 'amzn', 'msft', 'aapl', 'ibm', 'pltr', 'googl', 'dpz', 'dis', 'tmo']
+    tickers = ['tsla', 'amzn', 'msft', 'aapl', 'pltr']
 
     for ticker in tickers:
         collector = TweetCollector(token=token, ticker=ticker)
