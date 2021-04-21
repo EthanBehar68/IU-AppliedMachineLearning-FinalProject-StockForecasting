@@ -46,6 +46,11 @@ class SentimentModel():
         # build and fit the regression model
         self.model = LinearRegression().fit(x.reshape(-1,1),y.reshape(-1,1))
 
+        # plotting the regression model (uncomment to see)
+        # plt.scatter(x,y)
+        # plt.plot(x,self.model.predict(x.reshape(-1,1)))
+        # plt.show()
+
     def predict(self):
         # use actual ticker this sent-model is supposed to predict
         # TODO: this is why we need more data... cant be just using the same data as from
@@ -168,7 +173,7 @@ if __name__ == "__main__":
         preds,actual = model.predict()
         
         model.plot_results(preds=preds,actual=actual,
-                        title=f'SentimentModel {ticker} forcasted vs actual stock prices 2021-04-13 to 2021-04-19')
+                       title=f'SentimentModel {ticker} forcasted vs actual stock prices 2021-04-13 to 2021-04-19')
         
         error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
         print(f'{ticker}: {error}')
