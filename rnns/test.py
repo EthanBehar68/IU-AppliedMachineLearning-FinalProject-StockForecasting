@@ -140,7 +140,7 @@ class Test:
             # make the model
             self.model = self.Model(params=self.params)
 
-            # collect data from fastquant
+            # collect data from fastquant/quandl
             train_data = self.model.get_data(ticker=ticker,
                                         start_date=training_params['start'],
                                         end_date=training_params['end'])
@@ -153,8 +153,13 @@ class Test:
             self.model.train(train_data=train_data)
             preds, actuals = self.model.predict(test_data=test_data)
 
-            # get and save error
-            error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+            # get error for this window
+            if self.params['loss'] == "mean_abs_percent_error":
+                error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+            elif self.params['loss'] == "root_mean_squared_error":
+                error = self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
+            else:
+                raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
 
             self.results[f'{self.model.name}:{ticker}'] = error
 
@@ -201,7 +206,12 @@ class Test:
                 preds, actuals = self.model.predict(test_data=test_data)
 
                 # get error for this window
-                error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                if self.params['loss'] == "mean_abs_percent_error":
+                    error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                elif self.params['loss'] == "root_mean_squared_error":
+                    error += self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
+                else:
+                    raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
                 test_n += 1
 
                 print('DONE')
