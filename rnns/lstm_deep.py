@@ -71,10 +71,8 @@ class LSTMModel(Model):
         return np.array(preds).flatten(), test_close_prices
     
     def data_prep(self, data):
-        df = pd.DataFrame(data=None, columns=['fracChange', 'fracHigh', 'fracLow'])
+        df = pd.DataFrame(data=None, columns=['fracChange'])
         df['fracChange'] = (data['close']-data['open'])/data['open']
-        df['fracHigh'] = (data['high']-data['open'])/data['open']
-        df['fracLow'] = (data['open']-data['low'])/data['open']
 
         return df
 
