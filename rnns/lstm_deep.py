@@ -24,6 +24,7 @@ class LSTMModel(Model):
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
         self.train_obs = self.data_prep(train_data).values
+        self.train_labels = self.data_prep(train_data)['fracChange'].values
         self.scaler = MinMaxScaler(feature_range=(0,1))
         self.scaler = self.scaler.fit(self.train_obs)
         self.train_obs = self.scaler.transform(self.train_obs)
@@ -33,7 +34,7 @@ class LSTMModel(Model):
         x_train, y_train = [],[]
         for i in range(self.d, len(self.train_obs)):
             x_train.append(self.train_obs[i-self.d:i,0])
-            y_train.append(self.train_obs[i,0])
+            y_train.append(self.train_labels[i,0])
         
         x_train,y_train = np.array(x_train),np.array(y_train)
         x_train = np.reshape(x_train, (*x_train.shape,1))
@@ -63,7 +64,6 @@ class LSTMModel(Model):
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
-            pred_frac_change = self.scaler.inverse_transform(pred_frac_change)
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close.reshape(1,))
             
