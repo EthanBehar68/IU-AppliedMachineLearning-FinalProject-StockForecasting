@@ -37,11 +37,14 @@ class GHMM(Model):
         
         # list to hold predictions
         preds = []
+
+        # sample 10k points from the fracChange distribution of the training data as our possible next days
+        mean = self.train_obs['fracChange'].mean()
+        std = self.train_obs['fracChange'].std()
+        change = np.random.normal(loc=mean, scale=std, size=10000)
         
         # loop through all points we want to test
         for i in range(len(test_data)):
-            # try 50x10x10 possible values for O_d+1
-            change = np.arange(-0.2,0.2,0.4/10000)
 
             observations = [np.array([c]) for c in change]
             
