@@ -47,8 +47,8 @@ class SentimentModel():
         self.model = LinearRegression().fit(x.reshape(-1,1),y.reshape(-1,1))
 
         # plotting the regression model (uncomment to see)
-        # plt.scatter(x,y)
-        # plt.plot(x,self.model.predict(x.reshape(-1,1)))
+        # plt.scatter(x,y,c=tab:blue)
+        # plt.plot(x,self.model.predict(x.reshape(-1,1)),c=tab:green)
         # plt.show()
 
     def predict(self):
