@@ -23,6 +23,7 @@ class RNNModel(Model):
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
         self.train_obs = self.data_prep(train_data).values
+        self.train_labels = self.data_prep(train_data).values
         self.scaler = MinMaxScaler(feature_range=(0,1))
         self.scaler = self.scaler.fit(self.train_obs)
         self.train_obs = self.scaler.transform(self.train_obs)
@@ -32,7 +33,7 @@ class RNNModel(Model):
         x_train, y_train = [],[]
         for i in range(self.d, len(self.train_obs)):
             x_train.append(self.train_obs[i-self.d:i,0])
-            y_train.append(self.train_obs[i,0])
+            y_train.append(self.train_labels[i,0])
         
         x_train,y_train = np.array(x_train),np.array(y_train)
         x_train = np.reshape(x_train, (*x_train.shape,1))
