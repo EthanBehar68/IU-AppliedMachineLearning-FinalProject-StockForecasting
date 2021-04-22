@@ -41,7 +41,7 @@ class GHMM(Model):
         # loop through all points we want to test
         for i in range(len(test_data)):
             # try 50x10x10 possible values for O_d+1
-            change = np.arange(-0.2,0.2,0.4/5000)
+            change = np.arange(-0.2,0.2,0.4/10000)
 
             observations = [np.array([c]) for c in change]
             
