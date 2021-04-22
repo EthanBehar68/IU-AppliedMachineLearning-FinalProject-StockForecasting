@@ -72,7 +72,7 @@ def gen_model():
 
     return model
 
-def train_model(model,x_train,y_train,x_test,inepoch,inbatch_size,sc,optimizer_func,loss_func)
+def train_model(model,x_train,y_train,x_test,inepoch,inbatch_size,sc,optimizer_func,loss_func):
     model.compile(optimizer=optimizer_func,loss=loss_func)
 
     model.fit(x_train,y_train,epochs=inepoch,batch_size=inbatch_size)
