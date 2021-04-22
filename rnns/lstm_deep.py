@@ -96,9 +96,9 @@ if __name__ == "__main__":
               'loss': 'mean_squared_error',
               'activation': 'tanh',
               'recurrent_activation': 'sigmoid',
-              'epochs': 1,
+              'epochs': 30,
               'batch_size': 128,
-              'd': 5,
+              'd': 100,
               'name': 'LSTM-deep'}
     
     print('paper tests')
