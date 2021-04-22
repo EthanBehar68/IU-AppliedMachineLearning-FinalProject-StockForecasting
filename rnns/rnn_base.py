@@ -33,7 +33,7 @@ class RNNModel(Model):
         x_train, y_train = [],[]
         for i in range(self.d, len(self.train_obs)):
             x_train.append(self.train_obs[i-self.d:i,0])
-            y_train.append(self.train_labels[i,0])
+            y_train.append(self.train_labels[i])
         
         x_train,y_train = np.array(x_train),np.array(y_train)
         x_train = np.reshape(x_train, (*x_train.shape,1))
