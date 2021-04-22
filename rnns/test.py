@@ -5,6 +5,39 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 
+# Tests to match Roondiwala et al (Title = Predicting Stock Prices Using LSTM)
+# Tests use quandl instead of fastquant
+# Example data pull quandl.get("NSE/NIFTY_50", start_date='2011-01-01', end_date='2016-12-31') - ticker info: https://www.quandl.com/data/NSE-National-Stock-Exchange-of-India
+roonetal_tests = {
+    'test1': {
+        'train':
+            {'ticker':'NSE/NIFTY_50', 'start':'2011-01-01', 'end':'2015-10-01'},
+        'test':
+            {'ticker':'NSE/NIFTY_50', 'start':'2004-09-13', 'end':'2016-12-31'}
+    }
+}
+
+heavy_hitters_tests = {
+    'test1': {
+        'train':
+            {'ticker':'F', 'start':'2007-01-01', 'end':'2015-01-01'}, # Ford
+        'test':
+            {'ticker':'F', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test2': {
+        'train':
+            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'},
+        'test':
+            {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test3': {
+        'train':
+            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'},
+        'test':
+            {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
+    }
+}
+
 # file to test using multiple tickers with dates
 paper_tests = {
     'test1': {
