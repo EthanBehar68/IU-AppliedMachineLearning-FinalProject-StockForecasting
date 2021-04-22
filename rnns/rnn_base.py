@@ -51,6 +51,7 @@ class RNNModel(Model):
     def predict(self, test_data):
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
+        test_obs = self.scaler.transform(self.data_prep(test_data).values)
 
         observed = self.train_obs[-self.d:]
 
@@ -58,10 +59,9 @@ class RNNModel(Model):
 
         for i in range(len(test_data)):
             pred_frac_change = self.model.predict(observed.reshape(1,self.d,1))
-            observed = np.vstack((observed,pred_frac_change))
+            observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
-            pred_frac_change = self.scaler.inverse_transform(pred_frac_change)
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close.reshape(1,))
             
@@ -94,13 +94,13 @@ if __name__ == "__main__":
               'd': 10,
               'name': 'RNN-base'}
     
-    # print('paper tests')
-    # test = Test(Model=RNNModel, params=params, tests=paper_tests, f='rnn-base-paper-tests.json', plot=True)
-    # test.fixed_origin_tests()
+    print('paper tests')
+    test = Test(Model=RNNModel, params=params, tests=paper_tests, f='rnn-base-paper-tests.json', plot=True)
+    test.fixed_origin_tests()
 
-    # print('own tests')
-    # test = Test(Model=RNNModel, params=params, tests=own_tests, f='rnn-base-own-tests.json', plot=True)
-    # test.fixed_origin_tests()
+    print('own tests')
+    test = Test(Model=RNNModel, params=params, tests=own_tests, f='rnn-base-own-tests.json', plot=True)
+    test.fixed_origin_tests()
 
     print('testing')
     test = Test(Model=RNNModel, params=params, tests=rolling_window_tests, f='rnn-rolling-tests.json', plot=True)
