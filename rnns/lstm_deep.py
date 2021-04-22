@@ -52,14 +52,15 @@ class LSTMModel(Model):
     def predict(self, test_data):
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
+        test_obs = self.scaler.transform(self.data_prep(test_data))
 
         observed = self.train_obs[-self.d:]
 
         preds = []
 
         for i in range(len(test_data)):
-            pred_frac_change = self.model.predict(observed.reshape(1,self.d,1))
-            observed = np.vstack((observed,pred_frac_change))
+            pred_frac_change = self.model.predict(observed.reshape(3,self.d,1))
+            observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
             pred_frac_change = self.scaler.inverse_transform(pred_frac_change)
@@ -71,8 +72,10 @@ class LSTMModel(Model):
         return np.array(preds).flatten(), test_close_prices
     
     def data_prep(self, data):
-        df = pd.DataFrame(data=None, columns=['fracChange'])
+        df = pd.DataFrame(data=None, columns=['fracChange','fracHigh','fracLow'])
         df['fracChange'] = (data['close']-data['open'])/data['open']
+        df['fracHigh'] = (data['high']-data['open'])/data['open']
+        df['fracLow'] = (data['open']-data['low'])/data['open']
 
         return df
 

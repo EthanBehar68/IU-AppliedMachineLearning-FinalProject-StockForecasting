@@ -30,6 +30,7 @@ class GHMM(Model):
     def predict(self,test_data):        
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
+        test_obs = self.data_prep(test_data).values
 
         # use a latency of d days. So observations start as training data
         observed = self.train_obs.iloc[-self.d:].values
@@ -55,9 +56,9 @@ class GHMM(Model):
                     if log_lik > best['log_lik']:
                         best['obs'],best['log_lik'] = obs,log_lik
 
-            # actually stack the best day on to the observations to use for next test point
+            # stack the actual observation on so we can predict next day
             # drop the first thing in observed to shift our latency window `d`
-            observed = np.vstack((observed,best['obs']))
+            observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
             #calculate the close value from best
@@ -91,14 +92,14 @@ if __name__ == "__main__":
               'd': 5,
               'name':'GHMM'}
     
-    # print('testing best found parameters paper tests')
-    # test = Test(Model=GHMM, params=params, tests=paper_tests, f='ghmm-paper-tests.json', plot=True)
-    # test.fixed_origin_tests()
+    print('testing best found parameters paper tests')
+    test = Test(Model=GHMM, params=params, tests=paper_tests, f='ghmm-paper-tests.json', plot=False)
+    test.fixed_origin_tests()
 
-    # print('testing best found parameters own tests')
-    # test = Test(Model=GHMM, params=params, tests=own_tests, f='ghmm-own-tests.json', plot=True)
-    # test.fixed_origin_tests()
+    print('testing best found parameters own tests')
+    test = Test(Model=GHMM, params=params, tests=own_tests, f='ghmm-own-tests.json', plot=False)
+    test.fixed_origin_tests()
 
     print('testing')
-    test = Test(Model=GHMM, params=params, tests=rolling_window_tests, f='ghmm-rolling-tests.json', plot=True)
+    test = Test(Model=GHMM, params=params, tests=rolling_window_tests, f='ghmm-rolling-tests.json', plot=False)
     test.rolling_window_test()
