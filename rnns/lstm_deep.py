@@ -24,11 +24,15 @@ class LSTMModel(Model):
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
         self.train_obs = self.data_prep(train_data).values
-        self.train_labels = self.data_prep(train_data)['fracChange'].values
         self.scaler = MinMaxScaler(feature_range=(0,1))
         self.scaler = self.scaler.fit(self.train_obs)
         self.train_obs = self.scaler.transform(self.train_obs)
 
+        self.train_labels = self.data_prep(train_data)['fracChange'].values
+        self.scaler_out = MinMaxScaler(feature_range=(0,1))
+        self.scaler_out = self.scaler_out.fit(self.train_obs)
+        self.train_labels = self.scaler_out.transform(self.train_labels)
+        
         # build the x as the observation from (O_i,...,O_i+d)
         # y is O_i+d
         x_train, y_train = [],[]
@@ -64,6 +68,7 @@ class LSTMModel(Model):
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
+            pred_frac_change = self.scaler_out.inverse_transform(pred_frac_change)
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close.reshape(1,))
             
@@ -85,7 +90,7 @@ class LSTMModel(Model):
         model.add(Dropout(0.1))
         model.add(LSTM(512,activation=self.activation,recurrent_activation=self.recurrent_activation))
         model.add(Dropout(0.1))
-        model.add(Dense(64,activation='sigmoid'))
+        model.add(Dense(16,activation='sigmoid'))
         model.add(Dense(1))
 
         return model
@@ -96,9 +101,9 @@ if __name__ == "__main__":
               'loss': 'mean_squared_error',
               'activation': 'tanh',
               'recurrent_activation': 'sigmoid',
-              'epochs': 30,
-              'batch_size': 128,
-              'd': 100,
+              'epochs': 50,
+              'batch_size': 75,
+              'd': 20,
               'name': 'LSTM-deep'}
     
     print('paper tests')
