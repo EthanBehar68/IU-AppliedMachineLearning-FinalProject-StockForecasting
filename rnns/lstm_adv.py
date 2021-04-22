@@ -27,6 +27,8 @@ class LSTMModel(Model):
         self.train_labels = self.data_prep(train_data).values
         self.scaler = MinMaxScaler(feature_range=(0,1))
         self.scaler = self.scaler.fit(self.train_obs)
+        self.scaler_out = MinMaxScaler(feature_range=(0,1)).fit(self.train_labels)
+        self.train_labels = self.scaler_out(self.train_labels)
         self.train_obs = self.scaler.transform(self.train_obs)
 
         # build the x as the observation from (O_i,...,O_i+d)
@@ -64,6 +66,7 @@ class LSTMModel(Model):
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
+            pred_frac_change = self.scaler_out.inverse_transform(pred_frac_change)
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close.reshape(1,))
             
