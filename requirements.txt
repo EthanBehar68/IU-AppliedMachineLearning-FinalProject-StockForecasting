@@ -12,3 +12,4 @@ ipykernel==5.5.3
 flair==0.8.0.post1
 requests==2.25.1
 requests-oauthlib==1.3.0
+quandl==3.6.1
