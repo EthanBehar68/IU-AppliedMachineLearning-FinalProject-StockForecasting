@@ -47,7 +47,7 @@ class LSTMModel(Model):
                        y=y_train, 
                        epochs=self.epochs, 
                        batch_size=self.batch_size,
-                       verbose=0)
+                       verbose=1)
 
     def predict(self, test_data):
         test_close_prices = test_data['close'].values
