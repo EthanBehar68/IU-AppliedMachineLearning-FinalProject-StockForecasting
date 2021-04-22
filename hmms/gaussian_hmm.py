@@ -39,6 +39,7 @@ class GHMM(Model):
         preds = []
 
         # sample 10k points from the fracChange distribution of the training data as our possible next days
+        np.random.seed(seed=47)
         mean = self.train_obs['fracChange'].mean()
         std = self.train_obs['fracChange'].std()
         change = np.random.normal(loc=mean, scale=std, size=10000)
