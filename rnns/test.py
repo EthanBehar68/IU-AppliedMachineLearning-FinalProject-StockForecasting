@@ -11,9 +11,9 @@ import math
 roonetal_tests = {
     'test1': {
         'train':
-            {'ticker':'NSE/NIFTY_50', 'start':'2011-01-01', 'end':'2015-10-01'},
+            {'ticker':'NSE/NIFTY_50', 'start':'2011-01-01', 'end':'2016-04-20'},
         'test':
-            {'ticker':'NSE/NIFTY_50', 'start':'2004-09-13', 'end':'2016-12-31'}
+            {'ticker':'NSE/NIFTY_50', 'start':'2016-04-21', 'end':'2016-10-31'}
     }
 }
 
@@ -166,7 +166,7 @@ class Test:
             # plot results if flag is set
             if self.plot:
                 self.model.plot_results(preds=preds, actual=actuals,
-                                        title=f'{self.model.name} {ticker} forcasted vs actual stock prices {testing_params["start"]} to {testing_params["end"]}')
+                                        title=f'{self.model.name} {ticker.replace("/", "-")} forcasted vs actual stock prices {testing_params["start"]} to {testing_params["end"]}')
         
         # write errors to file
         dump = json.dumps(self.results)
@@ -217,9 +217,9 @@ class Test:
                 print('DONE')
             
             # use last window for plotting
-            if self.plot:
+            if self.plot:                        
                 self.model.plot_continuous(preds=preds, train=train_data, actual=actuals,
-                                          title=f'{self.model.name} {ticker} forecasted vs actual continuous stock price')
+                                          title=f'{self.model.name} {ticker.replace("/", "-")} forecasted vs actual continuous stock price')
             
             # store average MAPE error
             avg_error = error/test_n
