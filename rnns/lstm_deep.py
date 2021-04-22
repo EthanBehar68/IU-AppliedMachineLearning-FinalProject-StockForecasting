@@ -33,11 +33,11 @@ class LSTMModel(Model):
         # y is O_i+d
         x_train, y_train = [],[]
         for i in range(self.d, len(self.train_obs)):
-            x_train.append(self.train_obs[i-self.d:i,0])
+            x_train.append(self.train_obs[i-self.d:i])
             y_train.append(self.train_labels[i])
         
         x_train,y_train = np.array(x_train),np.array(y_train)
-        x_train = np.reshape(x_train, (*x_train.shape,1))
+        y_train = np.reshape(y_train, (*y_train.shape,1))
 
         # build the model
         self.model = self.gen_model()
@@ -53,14 +53,14 @@ class LSTMModel(Model):
     def predict(self, test_data):
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
-        test_obs = self.scaler.transform(self.data_prep(test_data))
+        test_obs = self.scaler.transform(self.data_prep(test_data).values)
 
         observed = self.train_obs[-self.d:]
 
         preds = []
 
         for i in range(len(test_data)):
-            pred_frac_change = self.model.predict(observed.reshape(3,self.d,1))
+            pred_frac_change = self.model.predict(observed.reshape(1,self.d,3))
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
@@ -81,9 +81,9 @@ class LSTMModel(Model):
 
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(512,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(512,input_shape=(self.d,3), return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
         model.add(Dropout(0.1))
-        model.add(LSTM(512,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(512,activation=self.activation,recurrent_activation=self.recurrent_activation))
         model.add(Dropout(0.1))
         model.add(Dense(64,activation='sigmoid'))
         model.add(Dense(1))
@@ -96,9 +96,9 @@ if __name__ == "__main__":
               'loss': 'mean_squared_error',
               'activation': 'tanh',
               'recurrent_activation': 'sigmoid',
-              'epochs': 30,
+              'epochs': 1,
               'batch_size': 128,
-              'd': 100,
+              'd': 5,
               'name': 'LSTM-deep'}
     
     print('paper tests')
