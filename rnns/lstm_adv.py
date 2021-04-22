@@ -28,7 +28,7 @@ class LSTMModel(Model):
         self.scaler = MinMaxScaler(feature_range=(0,1))
         self.scaler = self.scaler.fit(self.train_obs)
         self.scaler_out = MinMaxScaler(feature_range=(0,1)).fit(self.train_labels)
-        self.train_labels = self.scaler_out(self.train_labels)
+        self.train_labels = self.scaler_out.transform(self.train_labels)
         self.train_obs = self.scaler.transform(self.train_obs)
 
         # build the x as the observation from (O_i,...,O_i+d)
