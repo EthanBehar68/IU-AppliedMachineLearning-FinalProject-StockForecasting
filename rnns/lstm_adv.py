@@ -36,7 +36,7 @@ class LSTMModel(Model):
             y_train.append(self.train_obs[i,0])
         
         x_train,y_train = np.array(x_train),np.array(y_train)
-        x_train = np.reshape(x_train, (*x_train,.shape,1))
+        x_train = np.reshape(x_train, (*x_train.shape,1))
         y_train = np.reshape(y_train, (*y_train.shape,1))
 
         # build the model
