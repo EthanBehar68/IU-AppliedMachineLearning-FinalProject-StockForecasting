@@ -5,6 +5,39 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 
+# Tests to match Roondiwala et al (Title = Predicting Stock Prices Using LSTM)
+# Tests use quandl instead of fastquant
+# Example data pull quandl.get("NSE/NIFTY_50", start_date='2011-01-01', end_date='2016-12-31') - ticker info: https://www.quandl.com/data/NSE-National-Stock-Exchange-of-India
+roonetal_tests = {
+    'test1': {
+        'train':
+            {'ticker':'NSE/NIFTY_50', 'start':'2011-01-01', 'end':'2015-10-01'},
+        'test':
+            {'ticker':'NSE/NIFTY_50', 'start':'2004-09-13', 'end':'2016-12-31'}
+    }
+}
+
+heavy_hitters_tests = {
+    'test1': {
+        'train':
+            {'ticker':'F', 'start':'2007-01-01', 'end':'2015-01-01'}, # Ford
+        'test':
+            {'ticker':'F', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test2': {
+        'train':
+            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'},
+        'test':
+            {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test3': {
+        'train':
+            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'},
+        'test':
+            {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
+    }
+}
+
 # file to test using multiple tickers with dates
 paper_tests = {
     'test1': {
@@ -107,7 +140,7 @@ class Test:
             # make the model
             self.model = self.Model(params=self.params)
 
-            # collect data from fastquant
+            # collect data from fastquant/quandl
             train_data = self.model.get_data(ticker=ticker,
                                         start_date=training_params['start'],
                                         end_date=training_params['end'])
@@ -120,8 +153,13 @@ class Test:
             self.model.train(train_data=train_data)
             preds, actuals = self.model.predict(test_data=test_data)
 
-            # get and save error
-            error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+            # get error for this window
+            if self.params['loss'] == "mean_abs_percent_error":
+                error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+            elif self.params['loss'] == "root_mean_squared_error":
+                error = self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
+            else:
+                raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
 
             self.results[f'{self.model.name}:{ticker}'] = error
 
@@ -168,7 +206,12 @@ class Test:
                 preds, actuals = self.model.predict(test_data=test_data)
 
                 # get error for this window
-                error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                if self.params['loss'] == "mean_abs_percent_error":
+                    error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                elif self.params['loss'] == "root_mean_squared_error":
+                    error += self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
+                else:
+                    raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
                 test_n += 1
 
                 print('DONE')
