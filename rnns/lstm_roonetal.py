@@ -3,7 +3,7 @@ import quandl
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import RMSprop
@@ -20,27 +20,61 @@ class LSTM_Roonetal(Model):
         self.epochs = params['epochs']
         self.batch_size = params['batch_size']
         self.d = params['d']
+        self.data_columns = params['data_columns']
         self.discretization = params['discretization']
         self.fill_method = params['fill_method']
+        self.normalization = params['normalization']
+        self.window_scaling = params['window_scaling']
+        self.window_scalers = {}
 
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
         self.train_data = train_data
-        self.scaler = MinMaxScaler(feature_range=(0,1))
 
+        # Bulk Normalization/Standization
+        if not self.window_scaling:
+            if self.normalization:
+                self.scaler = MinMaxScaler(feature_range=(0,1))
+            else:
+                self.scaler = StandardScaler()
+        
         # pull out the close values and scale them
-        train_vals = self.train_data[['close']].values
-        train_scale = self.scaler.fit_transform(train_vals)
+        train_vals = self.train_data[data_columns].values
+        train_scale = None
+        if not self.window_scaling:
+            train_scale = self.scaler.fit_transform(train_vals)
 
         # build the x as the observation from (O_i,...,O_i+d)
         # y is O_i+d
-        x_train, y_train = [],[]
-        for i in range(self.d, len(train_scale)):
-            x_train.append(train_scale[i-self.d:i,0])
-            y_train.append(train_scale[i,0])
+        x_train, y_train = [], []
+        for i in range(self.d, len(train_vals)):
+            # Bulk Normalization/Standization
+            if not self.window_scaling:
+                x_train.append(train_scale[i-self.d:i, 0])
+                y_train.append(train_scale[i,0])
+            else: # Window Normalization/Standization
+                if self.normalization:
+                    scaler = MinMaxScaler(feature_range=(0,1))
+                else:
+                    scaler = StandardScaler()
+                train_window = train_vals[i-self.d:i, 0].reshape(-1, 1)
+                scale_window = scaler.fit_transform(train_window)
+                # print(scale_window.shape)
+                # print(scale_window)
+                # print(scale_window[-1, 0])
+                self.window_scalers[i] = scaler
+                x_train.append(scale_window)
+                y_train.append(scale_window[-1, 0])
         
-        x_train,y_train = np.array(x_train),np.array(y_train)
-        x_train = np.reshape(x_train, (*x_train.shape,1))
+        x_train, y_train = np.array(x_train), np.array(y_train)
+
+        # print(x_train.shape)
+        # print(y_train.shape)
+        if not self.window_scaling:
+            x_train = np.reshape(x_train, (*x_train.shape, 1))
+
+        # print(x_train.shape)
+        # print(y_train.shape)
 
         # build the model
         self.model = self.gen_model()
@@ -60,29 +94,42 @@ class LSTM_Roonetal(Model):
         test_data = self.train_data[-(self.d-1):].append(test_data)
         test_data = test_data[['close']].values
 
+        # Bulk Normalization/Standization
         # scale the test data
-        test_scale = self.scaler.transform(test_data)
+        test_scale = None
+        if not self.window_scaling:
+            test_scale = self.scaler.transform(test_data)
 
         # build observations like in training
         x_test, actual = [],[]
-        for i in range(self.d, len(test_scale)):
-            x_test.append(test_scale[i-self.d:i,0])
+        for i in range(self.d, len(test_data)):
             # This paper leaves data normalized so we shall too
             # So we need y actual to be normalized.
             # actual.append(test_data[i,0])
-            actual.append(test_scale[i,0])
+            # Bulk Normalization/Standization
+            if not self.window_scaling:
+                x_test.append(test_scale[i-self.d:i, 0])
+                actual.append(test_scale[i,0])
+            else: # Window Normalization/Standization
+                scaler = self.window_scalers[i]
+                test_window = test_data[i-self.d:i, 0].reshape(-1, 1)
+                scale_window = scaler.fit_transform(test_window)
+                x_test.append(scale_window)
+                actual.append(scale_window[-1, 0])
 
         x_test, actual = np.array(x_test), np.array(actual)
-        x_test = np.reshape(x_test, (*x_test.shape,1))
+        if not self.window_scaling:
+            x_test = np.reshape(x_test, (*x_test.shape, 1))
 
         # predict the points
         preds = self.model.predict(x_test)
+
         # This paper leaves data normalized so we shall too
         # preds = self.scaler.inverse_transform(preds)
 
         return preds, actual
     
-    def get_data(self, ticker, start_date, end_date):
+    def get_data(self, ticker, start_date, end_date, data_columns=['close']):
         # get tickers' from https://www.quandl.com/data/
         # Drop unnecessary columns, rename to volume
         quandl.ApiConfig.api_key = 'NzYdeTcwJ539XMzzwZNS'
@@ -121,27 +168,144 @@ if __name__ == "__main__":
     params = {'lr': 0.001,
                 'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
                 'activation': 'tanh',
-                'epochs': 250, # Paper uses 250/500
+                'epochs': 500, # Paper uses 250/500
                 'batch_size': 150, # Paper doesn't specify batch sizes
                 'd': 22,  # Match paper
-                'name': 'LSTM_Roonetal',
-                'discretization': True,
-                'fill_method': 'previous'}
+                'data_columns': ['close'], 
+                'name': '0_LSTM_Roonetal-StdWin-NotRound-500',
+                'discretization': False,
+                'fill_method': 'previous',
+                'normalization': False,
+                'window_scaling': True}
     
-    print('Roonetal Tests with rounding')
-    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests, f='LSTM_Roonetal-forecast-tests.json', plot=True)
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='0_LSTM_Roonetal-StdWin-NotRound-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='0_LSTM_Roonetal-StdWin-NotRound-500-Back-forecast-tests.json', plot=True)
     test.fixed_origin_tests()
 
     params = {'lr': 0.001,
                 'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
                 'activation': 'tanh',
-                'epochs': 250, # Paper uses 250/500
+                'epochs': 500, # Paper uses 250/500
                 'batch_size': 150, # Paper doesn't specify batch sizes
                 'd': 22,  # Match paper
-                'name': 'LSTM_Roonetal_NotRounded',
+                'name': '0_LSTM_Roonetal-NormWin-NotRound-500',
                 'discretization': False,
-                'fill_method': 'previous'}
+                'fill_method': 'previous',
+                'normalization': True,
+                'window_scaling': True}
+    
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='0_LSTM_Roonetal-NormWin-NotRound-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
 
-    print('Roonetal Tests with no rounding')
-    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests, f='LSTM_Roonetal-NotRounded-forecast-tests.json', plot=True)
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='0_LSTM_Roonetal-NormWin-NotRound-500-Back-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    params = {'lr': 0.001,
+                'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
+                'activation': 'tanh',
+                'epochs': 500, # Paper uses 250/500
+                'batch_size': 150, # Paper doesn't specify batch sizes
+                'd': 22,  # Match paper
+                'name': '0_LSTM_Roonetal-Norm-NotRound-500',
+                'discretization': False,
+                'fill_method': 'previous',
+                'normalization': True,
+                'window_scaling': False}
+    
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='0_LSTM_Roonetal-Norm-NotRound-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='0_LSTM_Roonetal-Norm-NotRound-500-Back-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    params = {'lr': 0.001,
+                'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
+                'activation': 'tanh',
+                'epochs': 500, # Paper uses 250/500
+                'batch_size': 150, # Paper doesn't specify batch sizes
+                'd': 22,  # Match paper
+                'name': '0_LSTM_Roonetal-Std-NotRound-500',
+                'discretization': False,
+                'fill_method': 'previous',
+                'normalization': False,
+                'window_scaling': False}
+    
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='0_LSTM_Roonetal-Std-NotRound-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='0_LSTM_Roonetal-Std-NotRound-500-Back-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    params = {'lr': 0.001,
+                'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
+                'activation': 'tanh',
+                'epochs': 500, # Paper uses 250/500
+                'batch_size': 150, # Paper doesn't specify batch sizes
+                'd': 22,  # Match paper
+                'name': '1_LSTM_Roonetal-StdWin-Round-500',
+                'discretization': True,
+                'fill_method': 'previous',
+                'normalization': False,
+                'window_scaling': True}
+    
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='1_LSTM_Roonetal-StdWin-Round-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='1_LSTM_Roonetal-StdWin-Round-500-Back-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    params = {'lr': 0.001,
+                'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
+                'activation': 'tanh',
+                'epochs': 500, # Paper uses 250/500
+                'batch_size': 150, # Paper doesn't specify batch sizes
+                'd': 22,  # Match paper
+                'name': '1_LSTM_Roonetal-NormWin-Round-500',
+                'discretization': True,
+                'fill_method': 'previous',
+                'normalization': True,
+                'window_scaling': True}
+    
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='1_LSTM_Roonetal-NormWin-Round-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='1_LSTM_Roonetal-NormWin-Round-500-Back-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    params = {'lr': 0.001,
+                'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
+                'activation': 'tanh',
+                'epochs': 500, # Paper uses 250/500
+                'batch_size': 150, # Paper doesn't specify batch sizes
+                'd': 22,  # Match paper
+                'name': '1_LSTM_Roonetal-Norm-Round-500',
+                'discretization': True,
+                'fill_method': 'previous',
+                'normalization': True,
+                'window_scaling': False}
+    
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='1_LSTM_Roonetal-Norm-Round-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='1_LSTM_Roonetal-Norm-Round-500-Back-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    params = {'lr': 0.001,
+                'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
+                'activation': 'tanh',
+                'epochs': 500, # Paper uses 250/500
+                'batch_size': 150, # Paper doesn't specify batch sizes
+                'd': 22,  # Match paper
+                'name': '1_LSTM_Roonetal-Std-Round-500',
+                'discretization': True,
+                'fill_method': 'previous',
+                'normalization': False,
+                'window_scaling': False}
+    
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='1_LSTM_Roonetal-Std-Round-500-Full-forecast-tests.json', plot=True)
+    test.fixed_origin_tests()
+
+    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='1_LSTM_Roonetal-Std-Round-500-Back-forecast-tests.json', plot=True)
     test.fixed_origin_tests()
