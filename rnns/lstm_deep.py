@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, SimpleRNN, LSTM, Dropout
-from keras.optimizers import Adam
+from keras.optimizers import RMSprop
 from model import Model
 from test import *
 
@@ -27,25 +27,21 @@ class LSTMModel(Model):
         self.scaler = MinMaxScaler(feature_range=(0,1))
         self.scaler = self.scaler.fit(self.train_obs)
         self.train_obs = self.scaler.transform(self.train_obs)
-
-        self.train_labels = self.data_prep(train_data)['fracChange'].values.reshape(-1,1)
-        self.scaler_out = MinMaxScaler(feature_range=(0,1))
-        self.scaler_out = self.scaler_out.fit(self.train_labels)
-        self.train_labels = self.scaler_out.transform(self.train_labels)
         
         # build the x as the observation from (O_i,...,O_i+d)
         # y is O_i+d
         x_train, y_train = [],[]
         for i in range(self.d, len(self.train_obs)):
-            x_train.append(self.train_obs[i-self.d:i])
-            y_train.append(self.train_labels[i])
+            x_train.append(self.train_obs[i-self.d:i,0])
+            y_train.append(self.train_obs[i,0])
         
         x_train,y_train = np.array(x_train),np.array(y_train)
+        x_train = np.reshape(x_train, (*x_train.shape,1))
         y_train = np.reshape(y_train, (*y_train.shape,1))
 
         # build the model
         self.model = self.gen_model()
-        self.model.compile(optimizer=Adam(learning_rate=self.lr), loss=self.loss)
+        self.model.compile(optimizer=RMSprop(learning_rate=self.lr), loss=self.loss)
         
         # train the model
         self.model.fit(x=x_train, 
@@ -64,11 +60,11 @@ class LSTMModel(Model):
         preds = []
 
         for i in range(len(test_data)):
-            pred_frac_change = self.model.predict(observed.reshape(1,self.d,3))
+            pred_frac_change = self.model.predict(observed.reshape(1,self.d,1))
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
-            pred_frac_change = self.scaler_out.inverse_transform(pred_frac_change)
+            pred_frac_change = self.scaler.inverse_transform(pred_frac_change)
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close.reshape(1,))
             
@@ -77,20 +73,18 @@ class LSTMModel(Model):
         return np.array(preds).flatten(), test_close_prices
     
     def data_prep(self, data):
-        df = pd.DataFrame(data=None, columns=['fracChange','fracHigh','fracLow'])
+        df = pd.DataFrame(data=None, columns=['fracChange'])
         df['fracChange'] = (data['close']-data['open'])/data['open']
-        df['fracHigh'] = (data['high']-data['open'])/data['open']
-        df['fracLow'] = (data['open']-data['low'])/data['open']
 
         return df
 
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(512,input_shape=(self.d,3), return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
-        model.add(Dropout(0.1))
-        model.add(LSTM(512,activation=self.activation,recurrent_activation=self.recurrent_activation))
-        model.add(Dropout(0.1))
-        model.add(Dense(16,activation='sigmoid'))
+        model.add(LSTM(50,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(50,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(50,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(50,return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(50,activation=self.activation,recurrent_activation=self.recurrent_activation))
         model.add(Dense(1))
 
         return model
@@ -101,9 +95,9 @@ if __name__ == "__main__":
               'loss': 'mean_squared_error',
               'activation': 'tanh',
               'recurrent_activation': 'sigmoid',
-              'epochs': 50,
-              'batch_size': 75,
-              'd': 20,
+              'epochs': 100,
+              'batch_size': 150,
+              'd': 10,
               'name': 'LSTM-deep'}
     
     print('paper tests')
