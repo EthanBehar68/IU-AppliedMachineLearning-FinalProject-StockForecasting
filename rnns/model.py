@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 
+
 #Base model class
 class Model(ABC):
 
@@ -34,7 +35,9 @@ class Model(ABC):
         ax.yaxis.grid(True,ls='--')
         ax.legend()
         plt.savefig(f'../imgs/{title}.png')
-    
+        # Ethan needs this if running from .py file.
+        # plt.savefig(f'./imgs/{title}.png')
+
     # plotting function for training data + prediction + actual
     def plot_continuous(self, preds, train, actual, title):
         last_50 = train['close'].values[-50:]
@@ -54,10 +57,15 @@ class Model(ABC):
         ax.yaxis.grid(True,ls='--')
         ax.legend()
         plt.savefig(f'../imgs/{title}.png')
+        # Ethan needs this if running from .py file.
+        # plt.savefig(f'./imgs/{title}.png')
 
     # function to get error of the model based on preds and true values
     def mean_abs_percent_error(self, y_pred, y_true):
         return (1.0)/(len(y_pred))*((np.abs(y_pred-y_true)/np.abs(y_true))*100).sum()
+
+    def root_mean_squared_error(self, y_pred, y_true):
+        return np.sqrt(np.mean(np.square(y_pred - y_true)))
 
     # training function for the model, should create the model, train it, and store in self.model
     @abstractmethod
