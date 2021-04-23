@@ -252,7 +252,7 @@ for i in range(5):
             current_result = current_result + str(losses)
             results.append(current_result)
     else:
-        print('da fuq')
+        print('how is this possible - something went wrong')
 
 for s in results:
     print(s)
