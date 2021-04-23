@@ -8,7 +8,16 @@ import math
 # Tests to match Roondiwala et al (Title = Predicting Stock Prices Using LSTM)
 # Tests use quandl instead of fastquant
 # Example data pull quandl.get("NSE/NIFTY_50", start_date='2011-01-01', end_date='2016-12-31') - ticker info: https://www.quandl.com/data/NSE-National-Stock-Exchange-of-India
-roonetal_tests = {
+roonetal_tests_full = {
+    'test1': {
+        'train':
+            {'ticker':'NSE/NIFTY_50', 'start':'2011-01-01', 'end':'2016-6-20'},
+        'test':
+            {'ticker':'NSE/NIFTY_50', 'start':'2016-6-21', 'end':'2016-12-31'}
+    }
+}
+# Their testing dates shift back 43 days - trying to compensate for data length discrepancy.
+roonetal_tests_back = {
     'test1': {
         'train':
             {'ticker':'NSE/NIFTY_50', 'start':'2011-01-01', 'end':'2016-04-20'},
