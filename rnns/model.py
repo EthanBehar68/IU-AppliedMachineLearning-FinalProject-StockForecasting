@@ -36,7 +36,7 @@ class Model(ABC):
         ax.legend()
         plt.savefig(f'../imgs/{title}.png')
         # Ethan needs this if running from .py file.
-        # plt.savefig(f'./imgs/{title}.png')
+        # plt.savefig(f'./imgs/4-23-etb/test/{title}.png')
 
     # plotting function for training data + prediction + actual
     def plot_continuous(self, preds, train, actual, title):
@@ -58,7 +58,7 @@ class Model(ABC):
         ax.legend()
         plt.savefig(f'../imgs/{title}.png')
         # Ethan needs this if running from .py file.
-        # plt.savefig(f'./imgs/{title}.png')
+        # plt.savefig(f'./imgs/4-23-etb/test/{title}.png')
 
     # function to get error of the model based on preds and true values
     def mean_abs_percent_error(self, y_pred, y_true):
