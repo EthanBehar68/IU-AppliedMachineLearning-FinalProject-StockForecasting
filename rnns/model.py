@@ -21,6 +21,25 @@ class Model(ABC):
         return get_stock_data(ticker, start_date, end_date)
 
     # plotting function for standardized plot results
+    def plot_loss(self, t_loss, v_loss, title):
+        fig, ax = plt.subplots(figsize=(5,5))
+        ax.set_title(title, loc='center', pad=15, wrap=True)
+        time = range(len(t_loss))
+        ax.plot(time, t_loss,color='tab:red',marker='s',markersize=2,linestyle='-',linewidth=1,label='Train')
+        ax.plot(time, v_loss,color='tab:blue',marker='s',markersize=2,linestyle='-',linewidth=1,label='Val')
+        ax.set_xlabel('epoch')
+        ax.set_ylabel('loss')
+        ax.set_xticks(np.arange(0, len(t_loss)+10, 10))
+        ax.set_xlim(0, len(t_loss)+10)
+        ax.xaxis.grid(True,ls='--')
+        ax.yaxis.grid(True,ls='--')
+        ax.legend()
+        # plt.ticklabel_format(axis="y", style="plain")
+        # plt.savefig(f'../imgs/{title}.png')
+        # Ethan needs this if running from .py file.
+        plt.savefig(f'./imgs/4-24-etb/{title}.png')
+
+    # plotting function for standardized plot results
     def plot_results(self, preds, actual, title):
         fig, ax = plt.subplots(figsize=(15,5))
         ax.set_title(title)
@@ -34,9 +53,9 @@ class Model(ABC):
         ax.xaxis.grid(True,ls='--')
         ax.yaxis.grid(True,ls='--')
         ax.legend()
-        plt.savefig(f'../imgs/{title}.png')
+        # plt.savefig(f'../imgs/{title}.png')
         # Ethan needs this if running from .py file.
-        # plt.savefig(f'./imgs/4-23-etb/test/{title}.png')
+        plt.savefig(f'./imgs/4-24-etb/{title}.png')
 
     # plotting function for training data + prediction + actual
     def plot_continuous(self, preds, train, actual, title):
@@ -56,9 +75,9 @@ class Model(ABC):
         ax.xaxis.grid(True,ls='--')
         ax.yaxis.grid(True,ls='--')
         ax.legend()
-        plt.savefig(f'../imgs/{title}.png')
+        # plt.savefig(f'../imgs/{title}.png')
         # Ethan needs this if running from .py file.
-        # plt.savefig(f'./imgs/4-23-etb/test/{title}.png')
+        plt.savefig(f'./imgs/4-24-etb/{title}.png')
 
     # function to get error of the model based on preds and true values
     def mean_abs_percent_error(self, y_pred, y_true):

@@ -11,12 +11,13 @@ from keras.metrics import RootMeanSquaredError
 from model import Model
 from test import *
 
-class LSTM_Roonetal(Model):
+class LSTM_RoondiwalaEtAl(Model):
     def __init__(self, params):
         super().__init__(params)
         self.lr = params['lr']
         self.loss = params['loss']
         self.activation = params['activation']
+        self.recurrent_activation = params['recurrent_activation']
         self.epochs = params['epochs']
         self.batch_size = params['batch_size']
         self.d = params['d']
@@ -26,126 +27,136 @@ class LSTM_Roonetal(Model):
         self.fill_method = params['fill_method']
         self.normalization = params['normalization']
         self.window_scaling = params['window_scaling']
-        self.window_scalers = {}
+        self.obs_window_scalers = {}
+        self.label_window_scalers = {}
 
     def train(self, train_data):
-        # save train data and scaler obj because we will need it for testing
-        self.train_data = train_data
-        train_vals = self.train_data
-        x_train_data = train_vals[self.train_columns].values
-        print(x_train_data.shape)
-        y_train_data = train_vals[self.label_column].values
-        print(y_train_data.shape)
-
-        # Bulk Normalization/Standization
+        # Normalization/Standization for whole data set
+        # Save train data and scaler obj because we will need it for testing
+        self.train_obs = train_data[self.train_columns].values
+        self.train_label = train_data[self.label_column].values.reshape(-1,1)
         if not self.window_scaling:
             if self.normalization:
-                self.scaler = MinMaxScaler(feature_range=(0,1))
+                self.obs_scaler = MinMaxScaler(feature_range=(0,1))
+                self.label_scaler = MinMaxScaler(feature_range=(0,1))
             else:
-                self.scaler = StandardScaler()
-            x_train_scale = self.scaler.fit_transform(x_train_data)
-            y_train_scale = self.scaler.fit(y_train_data)
+                self.obs_scaler = StandardScaler()
+                self.label_scaler = StandardScaler()
+            x_train_scale = self.obs_scaler.fit_transform(self.train_obs)
+            y_train_scale = self.label_scaler.fit_transform(self.train_label)
+
 
         # build the x as the observation from (O_i,...,O_i+d)
         # y is O_i+d
         x_train, y_train = [], []
-        for i in range(self.d, len(x_train_data)):
-            # Bulk Normalization/Standization
+        for i in range(self.d, len(self.train_obs)):
+        # Normalization/Standization for whole data set
             if not self.window_scaling:
-                x_train.append(x_train_scale[i-self.d:i, 0:len(self.train_columns)])
-                y_train.append(y_train_scale[i, 0])
-            else: # Window Normalization/Standization
+                x_train.append(x_train_scale[i-self.d:i])
+                y_train.append(y_train_scale[i])
+            # Window Normalization/Standization for whole data set
+            else:
                 if self.normalization:
-                    scaler = MinMaxScaler(feature_range=(0,1))
+                    obs_scaler = MinMaxScaler(feature_range=(0,1))
+                    label_scaler = MinMaxScaler(feature_range=(0,1))
                 else:
-                    scaler = StandardScaler()
-                x_train_window = x_train_data[i-self.d:i, :]#.reshape(-1, 1)
-                x_scale_window = scaler.fit_transform(x_train_window)
+                    obs_scaler = StandardScaler()
+                    label_scaler = StandardScaler()
+                x_window = self.train_obs[i-self.d:i]
+                x_scale_window = obs_scaler.fit_transform(x_window)
                 x_train.append(x_scale_window)
-                y_train_window = np.tile(y_train_data[i], (1, len(self.train_columns)))
-                # print(y_train_window)
-                y_scale_window = scaler.transform(y_train_window)
-                print(y_scale_window)
+                self.obs_window_scalers[i] = obs_scaler
+                y_window = self.train_label[i].reshape(-1,1)
+                y_scale_window = label_scaler.fit_transform(y_window)
                 y_train.append(y_scale_window)
-                self.window_scalers[i] = scaler
+                self.label_window_scalers[i] = label_scaler
 
         x_train, y_train = np.array(x_train), np.array(y_train)
-        print(x_train.shape)
-        print(y_train.shape)
-        y_train = np.reshape(y_train[0], 1)
-        print(y_train.shape)
+        y_train = y_train.reshape(-1, 1)
 
-        if not self.window_scaling:
-            x_train = np.reshape(x_train, (*x_train.shape, 1))
+        # print(x_train.shape)
+        # print(y_train.shape)
 
         # build the model
         self.model = self.gen_model()
-        self.model.compile(
-            optimizer=RMSprop(learning_rate=self.lr),
-            loss='mse',
-            metrics=[RootMeanSquaredError()])
+        self.model.compile(optimizer=RMSprop(learning_rate=self.lr), loss=self.loss)
         
         # train the model
-        self.model.fit(x=x_train, 
-                       y=y_train, 
-                       epochs=self.epochs, 
-                       batch_size=self.batch_size,
-                       verbose=1)
+        return self.model.fit(  x=x_train, 
+                                y=y_train, 
+                                epochs=self.epochs, 
+                                batch_size=self.batch_size,
+                                validation_split=0.1,
+                                verbose=1)
 
     def predict(self, test_data):
-        test_data = self.train_data[-(self.d-1):].append(test_data)
-        test_data = test_data[label_column].values
+        # print(self.train_label[-(self.d-1):].shape)
+        # print(test_data[self.label_column].values.reshape(-1, 1).shape)
+        test_obs = np.concatenate((self.train_obs[-(self.d-1):], test_data[self.train_columns].values), axis=0)
+        test_label =  np.concatenate((self.train_label[-(self.d-1):], test_data[self.label_column].values.reshape(-1, 1)), axis=0)
 
-        # Bulk Normalization/Standization
-        # scale the test data
-        test_scale = None
+        # Normalization/Standization for whole data set
         if not self.window_scaling:
-            test_scale = self.scaler.transform(test_data)
+            test_scale_obs = self.obs_scaler.transform(test_obs)
 
-        # build observations like in training
-        x_test, actual = [],[]
+        # Build observations like in training
+        x_test, labels = [], []
         for i in range(self.d, len(test_data)):
-            # This paper leaves data normalized so we shall too
-            # So we need y actual to be normalized.
-            # actual.append(test_data[i,0])
-            # Bulk Normalization/Standization
+            # Normalization/Standization for whole data set
             if not self.window_scaling:
-                x_test.append(test_scale[i-self.d:i, 0])
-                actual.append(test_scale[i,0])
-            else: # Window Normalization/Standization
-                scaler = self.window_scalers[i]
-                test_window = test_data[i-self.d:i, 0].reshape(-1, 1)
-                scale_window = scaler.fit_transform(test_window)
-                x_test.append(scale_window)
-                actual.append(scale_window[-1, 0])
+                x_test.append(test_scale_obs[i-self.d:i])
+                labels.append(test_label[i])
+            # Window Normalization/Standization for whole data set
+            else:
+                obs_scaler = self.obs_window_scalers[i]
+                test_window_obs = test_obs[i-self.d:i]
+                scale_window_obs = obs_scaler.fit_transform(test_window_obs)
+                x_test.append(scale_window_obs)
+                labels.append(test_label[i])
 
-        x_test, actual = np.array(x_test), np.array(actual)
-        if not self.window_scaling:
-            x_test = np.reshape(x_test, (*x_test.shape, 1))
+        x_test, labels = np.array(x_test), np.array(labels)
 
         # predict the points
-        preds = self.model.predict(x_test)
+        scaled_preds = self.model.predict(x_test)
 
-        # This paper leaves data normalized so we shall too
-        # preds = self.scaler.inverse_transform(preds)
+        # Inverse data set
+        preds = []
+        if not self.window_scaling:
+            preds = self.label_scaler.inverse_transform(scaled_preds)
+        else: 
+            predictionIndex = 0
+            for i in range(self.d, len(test_data)):
+                # Window Inverse data set
+                label_scaler = self.label_window_scalers[i]
+                prediction = label_scaler.inverse_transform(scaled_preds[predictionIndex])
+                preds.append(prediction)
+                predictionIndex += 1
+            preds = np.array(preds)
 
-        return preds, actual
+        # print(preds.shape)
+        # print(labels.shape)
+
+        return preds, labels
+
+    # Saving just in case we come back to this    
+    # def get_data(self, ticker, start_date, end_date, data_columns=['close']):
+    #     # get tickers' from https://www.quandl.com/data/
+    #     # Drop unnecessary columns, rename to volume
+    #     quandl.ApiConfig.api_key = 'NzYdeTcwJ539XMzzwZNS'
+    #     return self.preprocess_data(
+    #         quandl.get(ticker, 
+    #             start_date=start_date, 
+    #             end_date=end_date)
+    #             .drop(columns=['Turnover (Rs. Cr)'], axis=1)
+    #             .rename(columns={'Shares Traded': 'volume', 
+    #                             'Close': 'close', 
+    #                             'Open': 'open', 
+    #                             'Low': 'low', 
+    #                             'High': 'high'}))
     
-    def get_data(self, ticker, start_date, end_date, data_columns=['close']):
-        # get tickers' from https://www.quandl.com/data/
-        # Drop unnecessary columns, rename to volume
-        quandl.ApiConfig.api_key = 'NzYdeTcwJ539XMzzwZNS'
-        return self.preprocess_data(
-            quandl.get(ticker, 
-                start_date=start_date, 
-                end_date=end_date)
-                .drop(columns=['Turnover (Rs. Cr)'], axis=1)
-                .rename(columns={'Shares Traded': 'volume', 
-                                'Close': 'close', 
-                                'Open': 'open', 
-                                'Low': 'low', 
-                                'High': 'high'}))
-    
+    def get_data(self, ticker, start_date, end_date):
+        return self.preprocess_data(get_stock_data(ticker, start_date, end_date))
+
     def preprocess_data(self, data):
         if self.discretization:
             data = data.round(0)
@@ -155,74 +166,79 @@ class LSTM_Roonetal(Model):
         
         return data
 
-    # Don't use the activation param - it's a bit limited in that it only uses one 
-    # This paper used 3 different activation functions (tanh is default)
+    # Faithfully recreating Roondiwala as close as possible
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(128, return_sequences=True, bias_initializer='glorot_uniform'))
-        model.add(LSTM(64, return_sequences=False, bias_initializer='glorot_uniform'))
-        model.add(Dense(16, init='uniform', bias_initializer='glorot_uniform'))
-        model.add(Dense(1, init='uniform', bias_initializer='glorot_uniform'))
+        model.add(LSTM(128, input_shape=(self.d, len(self.train_columns)), return_sequences=True))
+        model.add(LSTM(64, return_sequences=False))
+        model.add(Dense(16, init='uniform', activation='relu'))
+        model.add(Dense(1, init='uniform', activation='linear'))
         return model
 
 
 if __name__ == "__main__":
-    params = {'lr': 0.001,
-                'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
-                'activation': 'tanh',
-                'epochs': 250, # Paper uses 250/500
-                'batch_size': 150, # Paper doesn't specify batch sizes
-                'd': 22,  # Match paper
-                'train_columns': ['open', 'high'],
+    # Naming syntax please use
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    params = {'lr': 0.001, # learning rate
+                'loss': 'mean_absolute_percentage_error', # Loss function
+                'activation': 'tanh', # Not used
+                'recurrent_activation': 'sigmoid', # Not used
+                'epochs': 10, #250/500
+                'batch_size': 150,
+                'd': 22, # Taken from Roonwidala et al.
+                'train_columns': ['open', 'close'],
                 'label_column': 'close', 
-                'name': '0_LSTM_Roonetal-StdWin-NotRound-500',
-                'discretization': False,
-                'fill_method': 'previous',
-                'normalization': False,
-                'window_scaling': True}
+                'name': 'Roondiwala-Std-Win-250-OpenClose', 
+                'discretization': False, # Use value rounding?
+                'fill_method': 'previous', # fillna method='pa'
+                'normalization': False, # Normalize or standardization?
+                'window_scaling': True} # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='0_LSTM_Roonetal-StdWin-NotRound-500-Full-forecast-tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-OpenClose-Full-heavy_hitters_tests.json', plot=True)
     test.fixed_origin_tests()
 
-    test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='0_LSTM_Roonetal-StdWin-NotRound-500-Back-forecast-tests.json', plot=True)
-    test.fixed_origin_tests()
-
-    # params = {'lr': 0.001,
-    #             'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
-    #             'activation': 'tanh',
-    #             'epochs': 500, # Paper uses 250/500
-    #             'batch_size': 150, # Paper doesn't specify batch sizes
-    #             'd': 22,  # Match paper
-    #             'name': '0_LSTM_Roonetal-NormWin-NotRound-500',
-    #             'discretization': False,
-    #             'fill_method': 'previous',
-    #             'normalization': True,
-    #             'window_scaling': True}
+    # # Naming syntax please use
+    # # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # params = {'lr': 0.001, # learning rate
+    #             'loss': 'mean_absolute_percentage_error', # Loss function
+    #             'activation': 'tanh', # Not used
+    #             'recurrent_activation': 'sigmoid', # Not used
+    #             'epochs': 250, #250/500
+    #             'batch_size': 150,
+    #             'd': 22, # Taken from Roonwidala et al.
+    #             'train_columns': ['high', 'low', 'close'],
+    #             'label_column': 'close', 
+    #             'name': 'Roondiwala-Std-Win-250-HighLowClose', 
+    #             'discretization': False, # Use value rounding?
+    #             'fill_method': 'previous', # fillna method='pa'
+    #             'normalization': False, # Normalize or standardization?
+    #             'window_scaling': True} # Window scaling or bulk scaling?
     
-    # test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='0_LSTM_Roonetal-NormWin-NotRound-500-Full-forecast-tests.json', plot=True)
+    # test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowClose-heavy_hitters_tests.json', plot=True)
     # test.fixed_origin_tests()
 
-    # test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='0_LSTM_Roonetal-NormWin-NotRound-500-Back-forecast-tests.json', plot=True)
-    # test.fixed_origin_tests()
-
-    # params = {'lr': 0.001,
-    #             'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
-    #             'activation': 'tanh',
-    #             'epochs': 500, # Paper uses 250/500
-    #             'batch_size': 150, # Paper doesn't specify batch sizes
-    #             'd': 22,  # Match paper
-    #             'name': '0_LSTM_Roonetal-Norm-NotRound-500',
-    #             'discretization': False,
-    #             'fill_method': 'previous',
-    #             'normalization': True,
-    #             'window_scaling': False}
+    # # Naming syntax please use
+    # # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # params = {'lr': 0.001, # learning rate
+    #             'loss': 'mean_absolute_percentage_error', # Loss function
+    #             'activation': 'tanh', # Not used
+    #             'recurrent_activation': 'sigmoid', # Not used
+    #             'epochs': 250, #250/500
+    #             'batch_size': 150,
+    #             'd': 22, # Taken from Roonwidala et al.
+    #             'train_columns': ['high', 'low', 'open', 'close'],
+    #             'label_column': 'close', 
+    #             'name': 'Roondiwala-Std-Win-250-HighLowOpenClose', 
+    #             'discretization': False, # Use value rounding?
+    #             'fill_method': 'previous', # fillna method='pa'
+    #             'normalization': False, # Normalize or standardization?
+    #             'window_scaling': True} # Window scaling or bulk scaling?
     
-    # test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_full, f='0_LSTM_Roonetal-Norm-NotRound-500-Full-forecast-tests.json', plot=True)
+    # test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowOpenClose-heavy_hitters_tests.json', plot=True)
     # test.fixed_origin_tests()
 
-    # test = Test(Model=LSTM_Roonetal, params=params, tests=roonetal_tests_back, f='0_LSTM_Roonetal-Norm-NotRound-500-Back-forecast-tests.json', plot=True)
-    # test.fixed_origin_tests()
-
+    # Old, from when we tried to match the paper
+    # But we abandoned that b/c too many unknown vars
     # params = {'lr': 0.001,
     #             'loss': 'root_mean_squared_error', # Match paper, this line in compile method metrics=[tf.keras.metrics.RootMeanSquaredError()] makes is RMSE instead of MSE
     #             'activation': 'tanh',

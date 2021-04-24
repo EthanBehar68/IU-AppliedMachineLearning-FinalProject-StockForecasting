@@ -35,15 +35,27 @@ heavy_hitters_tests = {
     },
     'test2': {
         'train':
-            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'},
+            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'}, # Microsoft
         'test':
             {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
     },
     'test3': {
         'train':
-            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'},
+            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'}, # Amazon
         'test':
             {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test4': {
+        'train':
+            {'ticker':'MRK', 'start':'2007-01-01', 'end':'2015-01-01'}, # Merck & Co.
+        'test':
+            {'ticker':'MRK', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test5': {
+        'train':
+            {'ticker':'NKE', 'start':'2007-01-01', 'end':'2015-01-01'}, # Nike
+        'test':
+            {'ticker':'NKE', 'start':'2015-01-02', 'end':'2016-01-02'}
     }
 }
 
@@ -159,11 +171,14 @@ class Test:
                                        end_date=testing_params['end'])
 
             # train and predict
-            self.model.train(train_data=train_data)
+            model_history = self.model.train(train_data=train_data)
             preds, actuals = self.model.predict(test_data=test_data)
 
+            # print(model_history.history['loss'])
+            # print(model_history.history['val_loss'])
+
             # get error for this window
-            if self.params['loss'] == "mean_abs_percent_error":
+            if self.params['loss'] == "mean_absolute_percentage_error": # updated to keras' name for the loss
                 error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
             elif self.params['loss'] == "root_mean_squared_error":
                 error = self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
@@ -176,7 +191,9 @@ class Test:
             if self.plot:
                 self.model.plot_results(preds=preds, actual=actuals,
                                         title=f'{self.model.name} {ticker.replace("/", "-")} forcasted vs actual stock prices {testing_params["start"]} to {testing_params["end"]}')
-        
+                if model_history is not None:
+                    self.model.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'],
+                                        title=f'{self.model.name} {ticker.replace("/", "-")} train vs validation loss {testing_params["start"]} to {testing_params["end"]}')
         # write errors to file
         dump = json.dumps(self.results)
         output_file = open(self.f, 'w')

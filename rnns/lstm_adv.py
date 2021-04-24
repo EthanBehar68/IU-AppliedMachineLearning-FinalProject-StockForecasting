@@ -10,7 +10,7 @@ from model import Model
 from test import *
 
 class LSTMModel(Model):
-    def __init__(self,params):
+    def __init__(self, params):
         super().__init__(params)
         self.lr = params['lr']
         self.loss = params['loss']
@@ -19,7 +19,6 @@ class LSTMModel(Model):
         self.epochs = params['epochs']
         self.batch_size = params['batch_size']
         self.d = params['d']
-
 
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
@@ -40,8 +39,10 @@ class LSTMModel(Model):
             x_train.append(self.train_obs[i-self.d:i])
             y_train.append(self.train_labels[i])
         
-        x_train,y_train = np.array(x_train),np.array(y_train)
-        y_train = np.reshape(y_train, (*y_train.shape,1))
+        x_train,y_train = np.array(x_train), np.array(y_train)
+        y_train = np.reshape(y_train, (*y_train.shape, 1))
+
+        print(y_train.shape)
 
         # build the model
         self.model = self.gen_model()
@@ -72,7 +73,7 @@ class LSTMModel(Model):
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close.reshape(1,))
             
-            print(f'{i+1}/{len(test_data)}',end='\r',flush=True)
+            print(f'{i+1}/{len(test_data)}', end='\r', flush=True)
 
         return np.array(preds).flatten(), test_close_prices
     
@@ -86,7 +87,7 @@ class LSTMModel(Model):
 
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(512,input_shape=(self.d,3), return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
+        model.add(LSTM(512,input_shape=(self.d, 3), return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))
         model.add(Dropout(0.1))
         model.add(LSTM(512,activation=self.activation,recurrent_activation=self.recurrent_activation))
         model.add(Dropout(0.1))
@@ -110,10 +111,10 @@ if __name__ == "__main__":
     test = Test(Model=LSTMModel, params=params, tests=paper_tests, f='lstm-adv-paper-tests.json', plot=True)
     test.fixed_origin_tests()
 
-    print('own tests')
-    test = Test(Model=LSTMModel, params=params, tests=own_tests, f='lstm-adv-own-tests.json', plot=True)
-    test.fixed_origin_tests()
+    # print('own tests')
+    # test = Test(Model=LSTMModel, params=params, tests=own_tests, f='lstm-adv-own-tests.json', plot=True)
+    # test.fixed_origin_tests()
 
-    print('testing')
-    test = Test(Model=LSTMModel, params=params, tests=rolling_window_tests, f='lstm-adv-rolling-tests.json', plot=True)
-    test.rolling_window_test()
+    # print('testing')
+    # test = Test(Model=LSTMModel, params=params, tests=rolling_window_tests, f='lstm-adv-rolling-tests.json', plot=True)
+    # test.rolling_window_test()
