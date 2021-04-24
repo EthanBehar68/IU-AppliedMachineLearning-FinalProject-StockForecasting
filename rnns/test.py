@@ -218,7 +218,7 @@ class Test:
             window = get_stock_data(ticker,window_params['start'],window_params['end'])
 
             # 10 tests within the window
-            for i in range(0,100,10):
+            for i in range(0, 100, 10):
                 train_data = window.iloc[i:i+training_size]
                 test_data = window.iloc[i+training_size:i+training_size+testing_size]
 
@@ -228,11 +228,11 @@ class Test:
                 self.model = self.Model(params=self.params)
 
                 # train and predict
-                self.model.train(train_data=train_data)
+                model_history = self.model.train(train_data=train_data)
                 preds, actuals = self.model.predict(test_data=test_data)
 
                 # get error for this window
-                if self.params['loss'] == "mean_abs_percent_error":
+                if self.params['loss'] == "mean_absolute_percentage_error": # updated to keras' name for the loss
                     error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
                 elif self.params['loss'] == "root_mean_squared_error":
                     error += self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
@@ -246,7 +246,9 @@ class Test:
             if self.plot:                        
                 self.model.plot_continuous(preds=preds, train=train_data, actual=actuals,
                                           title=f'{self.model.name} {ticker.replace("/", "-")} forecasted vs actual continuous stock price')
-            
+                if model_history is not None:
+                    self.model.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'],
+                                        title=f'{self.model.name} {ticker.replace("/", "-")} train vs validation loss {testing_params["start"]} to {testing_params["end"]}')            
             # store average MAPE error
             avg_error = error/test_n
             self.results[f'{self.model.name}:{ticker}'] = avg_error
