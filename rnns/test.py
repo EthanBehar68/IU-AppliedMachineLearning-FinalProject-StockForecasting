@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
+from lstm_roondiwalaetal import *
 
 # Tests to match Roondiwala et al (Title = Predicting Stock Prices Using LSTM)
 # Tests use quandl instead of fastquant
@@ -32,55 +33,57 @@ heavy_hitters_tests = {
         'train':
             {'ticker':'F', 'start':'2007-01-01', 'end':'2015-01-01'}, # Ford
         'test':
-            {'ticker':'F', 'start':'2015-01-02', 'end':'2016-01-02'}
-    },
-    'test2': {
-        'train':
-            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'}, # Microsoft
-        'test':
-            {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
-    },
-    'test3': {
-        'train':
-            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'}, # Amazon
-        'test':
-            {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
-    },
-    'test4': {
-        'train':
-            {'ticker':'MRK', 'start':'2007-01-01', 'end':'2015-01-01'}, # Merck & Co.
-        'test':
-            {'ticker':'MRK', 'start':'2015-01-02', 'end':'2016-01-02'}
-    },
-    'test5': {
-        'train':
-            {'ticker':'NKE', 'start':'2007-01-01', 'end':'2015-01-01'}, # Nike
-        'test':
-            {'ticker':'NKE', 'start':'2015-01-02', 'end':'2016-01-02'}
+            {'ticker':'F', 'start':'2015-01-02', 'end':'2016-02-23'}
     }
+    # ,
+    # 'test2': {
+    #     'train':
+    #         {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'}, # Microsoft
+    #     'test':
+    #         {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # },
+    # 'test3': {
+    #     'train':
+    #         {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'}, # Amazon
+    #     'test':
+    #         {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # },
+    # 'test4': {
+    #     'train':
+    #         {'ticker':'MRK', 'start':'2007-01-01', 'end':'2015-01-01'}, # Merck & Co.
+    #     'test':
+    #         {'ticker':'MRK', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # },
+    # 'test5': {
+    #     'train':
+    #         {'ticker':'NKE', 'start':'2007-01-01', 'end':'2015-01-01'}, # Nike
+    #     'test':
+    #         {'ticker':'NKE', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # }
 }
 
 window_heavy_hitters_tests = {
     'test1': {
         'window':
-            {'ticker':'F', 'start':'2007-01-01', 'end':'2016-01-02'} # Ford
-    },
-    'test2': {
-        'window':
-            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2016-01-02'}, # Microsoft
-    },
-    'test3': {
-        'window':
-            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2016-01-02'}, # Amazon
-    },
-    'test4': {
-        'window':
-            {'ticker':'MRK', 'start':'2007-01-01', 'end':'2016-01-02'}, # Merck & Co.
-    },
-    'test5': {
-        'window':
-            {'ticker':'NKE', 'start':'2007-01-01', 'end':'2016-01-02'}, # Nike
+            {'ticker':'F', 'start':'2007-01-01', 'end':'2016-02-23'} # Ford
     }
+    # ,
+    # 'test2': {
+    #     'window':
+    #         {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2016-02-23'}, # Microsoft
+    # },
+    # 'test3': {
+    #     'window':
+    #         {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2016-02-23'}, # Amazon
+    # },
+    # 'test4': {
+    #     'window':
+    #         {'ticker':'MRK', 'start':'2007-01-01', 'end':'2016-02-23'}, # Merck & Co.
+    # },
+    # 'test5': {
+    #     'window':
+    #         {'ticker':'NKE', 'start':'2007-01-01', 'end':'2016-02-23'}, # Nike
+    # }
 }
 
 # file to test using multiple tickers with dates
@@ -225,10 +228,7 @@ class Test:
         output_file.close()
 
 
-    def rolling_window_test(self, windows=10, train_size=200, test_size=66):
-        number_of_windows = windows
-        training_size = train_size
-        testing_size = test_size
+    def rolling_window_test(self, windows=10, train_size=1300, test_size=100):
         for test in self.tests.values():
             # var to store error and test num
             error = 0
@@ -243,58 +243,76 @@ class Test:
             data_size = window.shape[0]
             # testing_size = 10
 
-            # 10 tests within the window
-            for i in range(0, data_size, training_size+testing_size):
-                print('Train range: ', i, '-', i+training_size)
-                print('Test range: ', i+training_size, '-', i+training_size+testing_size)
-                train_data = window.iloc[i:i+training_size]
-                test_data = window.iloc[i+training_size:i+training_size+testing_size]
+            for i in range(0, windows * test_size, test_size):
+                print('Train range: ', i, '-', i+train_size)
+                print('Test range: ', i+train_size, '-', i+train_size+test_size)
+                train_data = window.iloc[i:i+train_size]
+                test_data = window.iloc[i+train_size:i+train_size+test_size]
+                print('Window train data shape: ', train_data.shape)
+                print('Window test data shape: ', test_data.shape)
 
-        #         print(f'window {i+1}')
+                # print(f'window {i+1}')
 
-        #         # make the model
-        #         self.model = self.Model(params=self.params)
+                # make the model
+                self.model = self.Model(params=self.params)
 
-        #         # train and predict
-        #         model_history = self.model.train(train_data=train_data)
-        #         preds, actuals = self.model.predict(test_data=test_data)
+                # train and predict
+                model_history = self.model.train(train_data=train_data)
+                preds, actuals = self.model.predict(test_data=test_data)
 
-        #         # get error for this window
-        #         if self.params['loss'] == "mean_absolute_percentage_error": # updated to keras' name for the loss
-        #             error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
-        #         elif self.params['loss'] == "root_mean_squared_error":
-        #             error += self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
-        #         else:
-        #             raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
-        #         test_n += 1
+                # get error for this window
+                if self.params['loss'] == "mean_absolute_percentage_error": # updated to keras' name for the loss
+                    error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                elif self.params['loss'] == "root_mean_squared_error":
+                    error += self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
+                else:
+                    raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
+                test_n += 1
 
-        #         print('DONE')
+                print('DONE')
             
-        #     # use last window for plotting
-        #     if self.plot:                        
-        #         self.model.plot_continuous(preds=preds, train=train_data, actual=actuals,
-        #                                   title=f'{self.model.name} {ticker.replace("/", "-")} forecasted vs actual continuous stock price')
-        #         if model_history is not None:
-        #             self.model.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'],
-        #                                 title=f'{self.model.name} {ticker.replace("/", "-")} train vs validation loss {testing_params["start"]} to {testing_params["end"]}')            
-        #     # store average MAPE error
-        #     avg_error = error/test_n
-        #     self.results[f'{self.model.name}:{ticker}'] = avg_error
+            # use last window for plotting
+            if self.plot:                        
+                self.model.plot_continuous(preds=preds, train=train_data, actual=actuals,
+                                          title=f'{self.model.name} {ticker.replace("/", "-")} forecasted vs actual continuous stock price')
+                if model_history is not None:
+                    self.model.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'],
+                                        title=f'{self.model.name} {ticker.replace("/", "-")} train vs validation loss')            
+            # store average MAPE error
+            avg_error = error/test_n
+            self.results[f'{self.model.name}:{ticker}'] = avg_error
         
-        # # write errors to file
-        # dump = json.dumps(self.results)
-        # output_file = open(self.f, 'w')
-        # output_file.write(dump)
-        # output_file.close()
+        # write errors to file
+        dump = json.dumps(self.results)
+        output_file = open(self.f, 'w')
+        output_file.write(dump)
+        output_file.close()
 
 if __name__ == "__main__":
-    test = rolling_window_tests['test6']['window']
-    df = get_stock_data(test['ticker'],test['start'],test['end'])
-    print('df')
-    print(df)
-    for i in range(0,100,10):
-        train = df.iloc[i:i+1155]
-        test = df.iloc[i+1155:i+1155+10]
-        print(i)
-        print(train)
-        print(test)
+    # test = rolling_window_tests['test6']['window']
+    # df = get_stock_data(test['ticker'],test['start'],test['end'])
+    # print('df')
+    # print(df)
+    # for i in range(0,100,10):
+    #     train = df.iloc[i:i+1155]
+    #     test = df.iloc[i+1155:i+1155+10]
+    #     print(i)
+    #     print(train)
+    #     print(test)
+    params = {'lr': 0.001, # learning rate
+            'loss': 'mean_absolute_percentage_error', # Loss function
+            'activation': 'tanh', # Not used
+            'recurrent_activation': 'sigmoid', # Not used
+            'epochs': 250, #250/500
+            'batch_size': 150,
+            'd': 22, # Taken from Roonwidala et al.
+            'train_columns': ['open', 'close'],
+            'label_column': 'close', 
+            'name': 'Roondiwala-Std-Win-250-OpenClose', 
+            'discretization': False, # Use value rounding?
+            'fill_method': 'previous', # fillna method='pa'
+            'normalization': False, # Normalize or standardization?
+            'window_scaling': True} # Window scaling or bulk scaling?
+
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='Roondiwala-Std-Win-250-OpenClose-Window-heavy_hitters_tests.json', plot=True)
+    test.rolling_window_test()
