@@ -74,8 +74,8 @@ class LSTM_RoondiwalaEtAl(Model):
         x_train, y_train = np.array(x_train), np.array(y_train)
         y_train = y_train.reshape(-1, 1)
 
-        # print(x_train.shape)
-        # print(y_train.shape)
+        print(x_train.shape)
+        print(y_train.shape)
 
         # build the model
         self.model = self.gen_model()
@@ -90,8 +90,7 @@ class LSTM_RoondiwalaEtAl(Model):
                                 verbose=1)
 
     def predict(self, test_data):
-        # print(self.train_label[-(self.d-1):].shape)
-        # print(test_data[self.label_column].values.reshape(-1, 1).shape)
+        # Add self.d amount of days in front of test data so test_data[0] can be first prediction point
         test_obs = np.concatenate((self.train_obs[-(self.d-1):], test_data[self.train_columns].values), axis=0)
         test_label =  np.concatenate((self.train_label[-(self.d-1):], test_data[self.label_column].values.reshape(-1, 1)), axis=0)
 
@@ -132,9 +131,6 @@ class LSTM_RoondiwalaEtAl(Model):
                 preds.append(prediction)
                 predictionIndex += 1
             preds = np.array(preds)
-
-        # print(preds.shape)
-        # print(labels.shape)
 
         return preds, labels
 
@@ -179,12 +175,12 @@ class LSTM_RoondiwalaEtAl(Model):
 if __name__ == "__main__":
     #  ['open', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
     params = {'lr': 0.001, # learning rate
                 'loss': 'mean_absolute_percentage_error', # Loss function
                 'activation': 'tanh', # Not used
                 'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
+                'epochs': 1, #250/500
                 'batch_size': 150,
                 'd': 22, # Taken from Roonwidala et al.
                 'train_columns': ['open', 'close'],
@@ -195,12 +191,12 @@ if __name__ == "__main__":
                 'normalization': False, # Normalize or standardization?
                 'window_scaling': True} # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-OpenClose-Full-heavy_hitters_tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='Roondiwala-Std-Win-250-OpenClose-Window-heavy_hitters_tests.json', plot=True)
     test.rolling_window_test()
 
     # ['high', 'low', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
     params = {'lr': 0.001, # learning rate
                 'loss': 'mean_absolute_percentage_error', # Loss function
                 'activation': 'tanh', # Not used
@@ -216,12 +212,12 @@ if __name__ == "__main__":
                 'normalization': False, # Normalize or standardization?
                 'window_scaling': True} # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowClose-heavy_hitters_tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowClose-Window-heavy_hitters_tests.json', plot=True)
     test.rolling_window_test()
 
     # ['high', 'low', 'open', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
     params = {'lr': 0.001, # learning rate
                 'loss': 'mean_absolute_percentage_error', # Loss function
                 'activation': 'tanh', # Not used
@@ -237,12 +233,12 @@ if __name__ == "__main__":
                 'normalization': False, # Normalize or standardization?
                 'window_scaling': True} # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowOpenClose-heavy_hitters_tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowOpenClose-Window-heavy_hitters_tests.json', plot=True)
     test.rolling_window_test()
 
         #  ['open', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
     params = {'lr': 0.001, # learning rate
                 'loss': 'mean_absolute_percentage_error', # Loss function
                 'activation': 'tanh', # Not used
@@ -258,12 +254,12 @@ if __name__ == "__main__":
                 'normalization': False, # Normalize or standardization?
                 'window_scaling': True} # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-500-OpenClose-Full-heavy_hitters_tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='Roondiwala-Std-Win-500-OpenClose-Window-heavy_hitters_tests.json', plot=True)
     test.rolling_window_test()
 
     # ['high', 'low', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
     params = {'lr': 0.001, # learning rate
                 'loss': 'mean_absolute_percentage_error', # Loss function
                 'activation': 'tanh', # Not used
@@ -279,12 +275,12 @@ if __name__ == "__main__":
                 'normalization': False, # Normalize or standardization?
                 'window_scaling': True} # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-500-HighLowClose-heavy_hitters_tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='Roondiwala-Std-Win-500-HighLowClose-Window-heavy_hitters_tests.json', plot=True)
     test.rolling_window_test()
 
     # ['high', 'low', 'open', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
     params = {'lr': 0.001, # learning rate
                 'loss': 'mean_absolute_percentage_error', # Loss function
                 'activation': 'tanh', # Not used
@@ -300,5 +296,5 @@ if __name__ == "__main__":
                 'normalization': False, # Normalize or standardization?
                 'window_scaling': True} # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-500-HighLowOpenClose-heavy_hitters_tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='Roondiwala-Std-Win-500-HighLowOpenClose-Window-heavy_hitters_tests.json', plot=True)
     test.rolling_window_test()
