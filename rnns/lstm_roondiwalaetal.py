@@ -26,28 +26,26 @@ class LSTM_RoondiwalaEtAl(Model):
         self.discretization = params['discretization']
         self.fill_method = params['fill_method']
         self.normalization = params['normalization']
+        self.scaler = None
         self.window_scaling = params['window_scaling']
-        self.obs_window_scalers = {}
-        self.label_window_scalers = {}
+        self.window_scalers = {}
 
+    # If label column is not part of x train
+    # This needs to update
     def train(self, train_data):
-        # Normalization/Standization for whole data set
         # Save train data and scaler obj because we will need it for testing
-        self.train_obs = train_data[self.train_columns].values
-        self.train_label = train_data[self.label_column].values.reshape(-1,1)
+        self.train_obs = train_data.values
+
+        # Normalization/Standization for whole data set
         if not self.window_scaling:
             if self.normalization:
-                self.obs_scaler = MinMaxScaler(feature_range=(0,1))
-                self.label_scaler = MinMaxScaler(feature_range=(0,1))
+                self.scaler = MinMaxScaler(feature_range=(0,1))
             else:
-                self.obs_scaler = StandardScaler()
-                self.label_scaler = StandardScaler()
-            x_train_scale = self.obs_scaler.fit_transform(self.train_obs)
-            y_train_scale = self.label_scaler.fit_transform(self.train_label)
+                self.scaler = StandardScaler()
+            x_train_scale = self.scaler.fit_transform(self.train_obs)
+            y_train_scale = x_train_scale[:, self.label_column_index]        
 
-
-        # build the x as the observation from (O_i,...,O_i+d)
-        # y is O_i+d
+        # Build the x as the observation from (O_i,...,O_i+d), y is O_i+d
         x_train, y_train = [], []
         for i in range(self.d, len(self.train_obs)):
         # Normalization/Standization for whole data set
@@ -55,27 +53,23 @@ class LSTM_RoondiwalaEtAl(Model):
                 x_train.append(x_train_scale[i-self.d:i])
                 y_train.append(y_train_scale[i])
             # Window Normalization/Standization for whole data set
-            else:
-                if self.normalization:
-                    obs_scaler = MinMaxScaler(feature_range=(0,1))
-                    label_scaler = MinMaxScaler(feature_range=(0,1))
-                else:
-                    obs_scaler = StandardScaler()
-                    label_scaler = StandardScaler()
-                x_window = self.train_obs[i-self.d:i]
-                x_scale_window = obs_scaler.fit_transform(x_window)
-                x_train.append(x_scale_window)
-                self.obs_window_scalers[i] = obs_scaler
-                y_window = self.train_label[i].reshape(-1,1)
-                y_scale_window = label_scaler.fit_transform(y_window)
-                y_train.append(y_scale_window)
-                self.label_window_scalers[i] = label_scaler
+            # else:
+            #     if self.normalization:
+            #         scaler = MinMaxScaler(feature_range=(0,1))
+            #     else:
+            #         scaler = StandardScaler()
+            #     x_train_window = self.train_obs[i-self.d:i]
+            #     x_scale_window = scaler.fit_transform(x_train_window)
+            #     x_train.append(x_scale_window)
+            #     y_scale_window = x_scale_window[:, self.label_column_index]
+            #     y_train.append(y_scale_window[-1])
+            #     self.window_scalers[i] = scaler
+            #     self.abc.append(i)
 
         x_train, y_train = np.array(x_train), np.array(y_train)
         y_train = y_train.reshape(-1, 1)
-
-        print(x_train.shape)
-        print(y_train.shape)
+        print('x_train shape before training: ', x_train.shape)
+        print('y_train shape before training: ', y_train.shape)
 
         # build the model
         self.model = self.gen_model()
@@ -91,12 +85,12 @@ class LSTM_RoondiwalaEtAl(Model):
 
     def predict(self, test_data):
         # Add self.d amount of days in front of test data so test_data[0] can be first prediction point
-        test_obs = np.concatenate((self.train_obs[-(self.d-1):], test_data[self.train_columns].values), axis=0)
-        test_label =  np.concatenate((self.train_label[-(self.d-1):], test_data[self.label_column].values.reshape(-1, 1)), axis=0)
+        test_obs = np.concatenate((self.train_obs[-(self.d-1):], test_data.values), axis=0)
 
         # Normalization/Standization for whole data set
         if not self.window_scaling:
-            test_scale_obs = self.obs_scaler.transform(test_obs)
+            test_scale_obs = self.scaler.transform(test_obs)
+            test_scale_label = test_scale_obs[:, self.label_column_index]       
 
         # Build observations like in training
         x_test, labels = [], []
@@ -104,52 +98,31 @@ class LSTM_RoondiwalaEtAl(Model):
             # Normalization/Standization for whole data set
             if not self.window_scaling:
                 x_test.append(test_scale_obs[i-self.d:i])
-                labels.append(test_label[i])
+                labels.append(test_scale_label[i])
             # Window Normalization/Standization for whole data set
-            else:
-                obs_scaler = self.obs_window_scalers[i]
-                test_window_obs = test_obs[i-self.d:i]
-                scale_window_obs = obs_scaler.fit_transform(test_window_obs)
-                x_test.append(scale_window_obs)
-                labels.append(test_label[i])
+            # else:
+            #     # Get the window scaler
+            #     scaler = self.window_scalers[i]
+            #     # Scale the test data
+            #     test_window_obs = test_obs[i-self.d:i]
+            #     scale_windows_obs = scaler.transform(test_window_obs)
+            #     print(scale_windows_obs)
+            #     x_test.append(scale_windows_obs)
+            #     # Get the scaled label
+            #     scale_label_window = scale_windows_obs[:, self.label_column_index]
+            #     labels.append(scale_label_window[-1])
+            #     self.xyz.append(i)
 
         x_test, labels = np.array(x_test), np.array(labels)
+        labels = labels.reshape(-1, 1)
 
+        print('x_test shape before prediction: ' , x_test.shape)
         # predict the points
-        scaled_preds = self.model.predict(x_test)
-
-        # Inverse data set
-        preds = []
-        if not self.window_scaling:
-            preds = self.label_scaler.inverse_transform(scaled_preds)
-        else: 
-            predictionIndex = 0
-            for i in range(self.d, len(test_data)):
-                # Window Inverse data set
-                label_scaler = self.label_window_scalers[i]
-                prediction = label_scaler.inverse_transform(scaled_preds[predictionIndex])
-                preds.append(prediction)
-                predictionIndex += 1
-            preds = np.array(preds)
-
+        preds = self.model.predict(x_test)
+        print('preds: ' , preds.shape)
+        print('labels: ', labels.shape)
         return preds, labels
 
-    # Saving just in case we come back to this    
-    # def get_data(self, ticker, start_date, end_date, data_columns=['close']):
-    #     # get tickers' from https://www.quandl.com/data/
-    #     # Drop unnecessary columns, rename to volume
-    #     quandl.ApiConfig.api_key = 'NzYdeTcwJ539XMzzwZNS'
-    #     return self.preprocess_data(
-    #         quandl.get(ticker, 
-    #             start_date=start_date, 
-    #             end_date=end_date)
-    #             .drop(columns=['Turnover (Rs. Cr)'], axis=1)
-    #             .rename(columns={'Shares Traded': 'volume', 
-    #                             'Close': 'close', 
-    #                             'Open': 'open', 
-    #                             'Low': 'low', 
-    #                             'High': 'high'}))
-    
     def get_data(self, ticker, start_date, end_date):
         return self.preprocess_data(get_stock_data(ticker, start_date, end_date))
 
@@ -159,8 +132,17 @@ class LSTM_RoondiwalaEtAl(Model):
 
         if self.fill_method == 'previous':
             data = data.fillna(method='pad')
-        
+
+        # This breaks if label column is not a training column
+        data_columns = data.columns
+        # print('data_columns: ', data_columns)
+        # print('train_columns: ', self.train_columns)
+        [data.drop(c, axis=1, inplace=True) for c in data_columns if c not in self.train_columns]
+        # print('data_columns: ', data.columns)
+        self.label_column_index = data.columns.get_loc(self.label_column)
+
         return data
+
 
     # Faithfully recreating Roondiwala as close as possible
     def gen_model(self):
@@ -173,89 +155,89 @@ class LSTM_RoondiwalaEtAl(Model):
 
 
 if __name__ == "__main__":
-    #  ['close'] Test
+    # ['close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Rolling/Fixed}
     params = {'lr': 0.001, # learning rate
                 'loss': 'mean_absolute_percentage_error', # Loss function
                 'activation': 'tanh', # Not used
                 'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
+                'epochs': 50, #250/500
                 'batch_size': 150,
                 'd': 22, # Taken from Roonwidala et al.
                 'train_columns': ['close'],
                 'label_column': 'close', 
-                'name': 'Roondiwala-Std-Win-250-Close-Window', 
+                'name': 'Roondiwala-Std-250-Close-Fixed', 
                 'discretization': False, # Use value rounding?
                 'fill_method': 'previous', # fillna method='pa'
                 'normalization': False, # Normalize or standardization?
                 'window_scaling': True } # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-Close-Window-heavy_hitters_tests.json', plot=True)
+    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-250-Close-Fixed-heavy_hitters_tests.json', plot=True)
     test.fixed_origin_tests()
 
-    #  ['open', 'close'] Test
+    # ['open', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
-    params = {'lr': 0.001, # learning rate
-                'loss': 'mean_absolute_percentage_error', # Loss function
-                'activation': 'tanh', # Not used
-                'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
-                'batch_size': 150,
-                'd': 22, # Taken from Roonwidala et al.
-                'train_columns': ['open', 'close'],
-                'label_column': 'close', 
-                'name': 'Roondiwala-Std-Win-250-OpenClose-Window', 
-                'discretization': False, # Use value rounding?
-                'fill_method': 'previous', # fillna method='pa'
-                'normalization': False, # Normalize or standardization?
-                'window_scaling': True } # Window scaling or bulk scaling?
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Rolling/Fixed}
+    # params = {'lr': 0.001, # learning rate
+    #             'loss': 'mean_absolute_percentage_error', # Loss function
+    #             'activation': 'tanh', # Not used
+    #             'recurrent_activation': 'sigmoid', # Not used
+    #             'epochs': 250, #250/500
+    #             'batch_size': 150,
+    #             'd': 22, # Taken from Roonwidala et al.
+    #             'train_columns': ['open', 'close'],
+    #             'label_column': 'close', 
+    #             'name': 'Roondiwala-Std-250-OpenClose-Fixed', 
+    #             'discretization': False, # Use value rounding?
+    #             'fill_method': 'previous', # fillna method='pa'
+    #             'normalization': False, # Normalize or standardization?
+    #             'window_scaling': False } # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-OpenClose-Window-heavy_hitters_tests.json', plot=True)
-    test.fixed_origin_tests()
+    # test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-250-OpenClose-Fixed-heavy_hitters_tests.json', plot=True)
+    # test.fixed_origin_tests()
 
     # ['high', 'low', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
-    params = {'lr': 0.001, # learning rate
-                'loss': 'mean_absolute_percentage_error', # Loss function
-                'activation': 'tanh', # Not used
-                'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
-                'batch_size': 150,
-                'd': 22, # Taken from Roonwidala et al.
-                'train_columns': ['high', 'low', 'close'],
-                'label_column': 'close', 
-                'name': 'Roondiwala-Std-Win-250-HighLowClose-Window', 
-                'discretization': False, # Use value rounding?
-                'fill_method': 'previous', # fillna method='pa'
-                'normalization': False, # Normalize or standardization?
-                'window_scaling': True } # Window scaling or bulk scaling?
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Rolling/Fixed}
+    # params = {'lr': 0.001, # learning rate
+    #             'loss': 'mean_absolute_percentage_error', # Loss function
+    #             'activation': 'tanh', # Not used
+    #             'recurrent_activation': 'sigmoid', # Not used
+    #             'epochs': 250, #250/500
+    #             'batch_size': 150,
+    #             'd': 22, # Taken from Roonwidala et al.
+    #             'train_columns': ['high', 'low', 'close'],
+    #             'label_column': 'close', 
+    #             'name': 'Roondiwala-Std-250-HighLowClose-Fixed', 
+    #             'discretization': False, # Use value rounding?
+    #             'fill_method': 'previous', # fillna method='pa'
+    #             'normalization': False, # Normalize or standardization?
+    #             'window_scaling': False } # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowClose-Window-heavy_hitters_tests.json', plot=True)
-    test.fixed_origin_tests()
+    # test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-250-HighLowClose-Fixed-heavy_hitters_tests.json', plot=True)
+    # test.fixed_origin_tests()
 
     #  ['high', 'low', 'open', 'close'] Test
     # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Window/Fixed}
-    params = {'lr': 0.001, # learning rate
-                'loss': 'mean_absolute_percentage_error', # Loss function
-                'activation': 'tanh', # Not used
-                'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
-                'batch_size': 150,
-                'd': 22, # Taken from Roonwidala et al.
-                'train_columns': ['high', 'low', 'open', 'close'],
-                'label_column': 'close', 
-                'name': 'Roondiwala-Std-Win-250-HighLowOpenClose-Window', 
-                'discretization': False, # Use value rounding?
-                'fill_method': 'previous', # fillna method='pa'
-                'normalization': False, # Normalize or standardization?
-                'window_scaling': True } # Window scaling or bulk scaling?
+    # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Rolling/Fixed}
+    # params = {'lr': 0.001, # learning rate
+    #             'loss': 'mean_absolute_percentage_error', # Loss function
+    #             'activation': 'tanh', # Not used
+    #             'recurrent_activation': 'sigmoid', # Not used
+    #             'epochs': 250, #250/500
+    #             'batch_size': 150,
+    #             'd': 22, # Taken from Roonwidala et al.
+    #             'train_columns': ['high', 'low', 'open', 'close'],
+    #             'label_column': 'close', 
+    #             'name': 'Roondiwala-Std-250-HighLowOpenClose-Fixed', 
+    #             'discretization': False, # Use value rounding?
+    #             'fill_method': 'previous', # fillna method='pa'
+    #             'normalization': False, # Normalize or standardization?
+    #             'window_scaling': False } # Window scaling or bulk scaling?
     
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-Win-250-HighLowOpenClose-Window-heavy_hitters_tests.json', plot=True)
-    test.fixed_origin_tests()
+    # test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=heavy_hitters_tests, f='Roondiwala-Std-250-HighLowOpenClose-Fixed-heavy_hitters_tests.json', plot=True)
+    # test.fixed_origin_tests()
 
     # # ['high', 'low', 'close'] Test
     # # Naming syntax please use
