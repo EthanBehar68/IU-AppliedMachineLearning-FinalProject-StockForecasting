@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
+import os
 
 
 #Base model class
@@ -21,7 +22,7 @@ class Model(ABC):
         return get_stock_data(ticker, start_date, end_date)
 
     # plotting function for standardized plot results
-    def plot_loss(self, t_loss, v_loss, title):
+    def plot_loss(self, t_loss, v_loss, title, folder='./imgs/'):
         fig, ax = plt.subplots(figsize=(5,5))
         ax.set_title(title, loc='center', pad=15, wrap=True)
         time = range(len(t_loss))
@@ -34,13 +35,12 @@ class Model(ABC):
         ax.xaxis.grid(True,ls='--')
         ax.yaxis.grid(True,ls='--')
         ax.legend()
-        # plt.ticklabel_format(axis="y", style="plain")
         # plt.savefig(f'../imgs/{title}.png')
         # Ethan needs this if running from .py file.
-        plt.savefig(f'./imgs/4-25-etb/{title}.png')
+        plt.savefig(f'{folder}{title}.png')
 
     # plotting function for standardized plot results
-    def plot_results(self, preds, actual, title):
+    def plot_results(self, preds, actual, title, folder='./imgs/'):
         fig, ax = plt.subplots(figsize=(15,5))
         ax.set_title(title)
         time = range(len(preds))
@@ -55,7 +55,7 @@ class Model(ABC):
         ax.legend()
         # plt.savefig(f'../imgs/{title}.png')
         # Ethan needs this if running from .py file.
-        plt.savefig(f'./imgs/4-25-etb/{title}.png')
+        plt.savefig(f'{folder}{title}.png')
 
     # plotting function for training data + prediction + actual
     def plot_continuous(self, preds, train, actual, title):
@@ -75,9 +75,7 @@ class Model(ABC):
         ax.xaxis.grid(True,ls='--')
         ax.yaxis.grid(True,ls='--')
         ax.legend()
-        # plt.savefig(f'../imgs/{title}.png')
-        # Ethan needs this if running from .py file.
-        plt.savefig(f'./imgs/4-25-etb/{title}.png')
+        plt.savefig(f'../imgs/{title}.png')
 
     # function to get error of the model based on preds and true values
     def mean_abs_percent_error(self, y_pred, y_true):

@@ -1,4 +1,3 @@
-import quandl
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -10,9 +9,6 @@ import matplotlib.pyplot as plt
 # mydata = quandl.get("NSE/NIFTY_50", start_date='2016-04-21', end_date='2016-10-31')
 
 # Full
-quandl.ApiConfig.api_key = 'NzYdeTcwJ539XMzzwZNS'
-mydata = quandl.get("NSE/NIFTY_50", start_date='2016-6-21', end_date='2016-12-31')
-print(mydata.shape)
 # mydata = mydata.drop(columns=['Turnover (Rs. Cr)'], axis=1).rename(columns={"Shares Traded": "Volume"})
 # mydata = mydata.round(0)
 # mydata = mydata.fillna(method='pad')
