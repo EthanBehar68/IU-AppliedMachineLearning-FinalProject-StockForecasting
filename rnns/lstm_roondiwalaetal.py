@@ -106,7 +106,7 @@ class LSTM_RoondiwalaEtAl(Model):
             # Normalization/Standization for whole data set
             if not self.window_scaling:
                 x_test.append(test_scale_obs[i-self.d:i])
-                labels.append(test_scale_label[i])
+                labels.append(test_scale_label[i-1])
             # Window Normalization/Standization for whole data set
             # else:
             #     # Get the window scaler

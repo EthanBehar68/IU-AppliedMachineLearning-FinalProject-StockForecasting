@@ -154,13 +154,13 @@ class LSTM_MogharEtAl(Model):
     # Faithfully recreating Moghar Et Al as close as possible
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(50, input_shape=(self.d, len(self.train_columns)), return_sequences=True))
+        model.add(LSTM(128, input_shape=(self.d, len(self.train_columns)), return_sequences=True))
         model.add(Dropout(0.1))
-        model.add(LSTM(50, return_sequences=True))
+        model.add(LSTM(64, return_sequences=True))
         model.add(Dropout(0.1))
-        model.add(LSTM(50, return_sequences=True))
+        model.add(LSTM(32, return_sequences=True))
         model.add(Dropout(0.1))
-        model.add(LSTM(50, return_sequences=False))
+        model.add(LSTM(16, return_sequences=False))
         model.add(Dropout(0.1))
         model.add(Dense(1))
         return model

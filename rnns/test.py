@@ -43,25 +43,24 @@ window_heavy_hitters_tests = {
     'test1': {
         'window':
             {'ticker':'F', 'start':'2007-01-01', 'end':'2016-02-23'} # Ford
-    }
-    ,
+    },
     'test2': {
         'window':
             {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2016-02-23'}, # Microsoft
     }
-    #,
-    # 'test3': {
-    #     'window':
-    #         {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2016-02-23'}, # Amazon
-    # },
-    # 'test4': {
-    #     'window':
-    #         {'ticker':'MRK', 'start':'2007-01-01', 'end':'2016-02-23'}, # Merck & Co.
-    # },
-    # 'test5': {
-    #     'window':
-    #         {'ticker':'NKE', 'start':'2007-01-01', 'end':'2016-02-23'}, # Nike
-    # }
+    ,
+    'test3': {
+        'window':
+            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2016-02-23'}, # Amazon
+    },
+    'test4': {
+        'window':
+            {'ticker':'MRK', 'start':'2007-01-01', 'end':'2016-02-23'}, # Merck & Co.
+    },
+    'test5': {
+        'window':
+            {'ticker':'NKE', 'start':'2007-01-01', 'end':'2016-02-23'}, # Nike
+    }
 }
 
 # file to test using multiple tickers with dates
@@ -260,14 +259,14 @@ class Test:
                                             folder=folder)            
 
                 print('DONE PLOTTING')
+                index += 1
 
             # store average MAPE error
             avg_error = error/test_n
             self.results[f'{self.model.name}:{ticker}'] = avg_error
-            index += 1
 
         # write errors to file
-        json_file = f' {folder} {title}.json'
+        json_file = f'{folder}{self.model.name}.json'
         dump = json.dumps(self.results)
         output_file = open(json_file, 'w')
         output_file.write(dump)
