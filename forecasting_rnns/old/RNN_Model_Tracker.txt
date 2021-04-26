@@ -1,0 +1,136 @@
+gru_base.py
+GRU 50
+GRU 50
+GRU 50
+Dense 1
+{'lr': 0.001,
+'loss': 'mean_squared_error',
+'activation': 'tanh',
+'recurrent_activation': 'sigmoid',
+'epochs': 100,
+'batch_size': 150,
+'d': 10,
+'name': 'GRU-base'}
+
+lstm_base.py
+LSTM 50
+LSTM 50
+LSTM 50
+Dense 1
+{'lr': 0.001,
+'loss': 'mean_squared_error',
+'activation': 'tanh',
+'recurrent_activation': 'sigmoid',
+'epochs': 100,
+'batch_size': 150,
+'d': 10,
+'name': 'LSTM-base'}
+
+lstm_adv.py
+LSTM 50
+LSTM 50
+LSTM 50
+LSTM 50
+LSTM 50
+Dense 1
+{'lr': 0.001,
+'loss': 'mean_squared_error',
+'activation': 'tanh',
+'recurrent_activation': 'sigmoid',
+'epochs': 100,
+'batch_size': 150,
+'d': 10,
+'name': 'LSTM-adv'}
+
+lstm_deep.py
+LSTM 512
+Dropout 0.1
+LSTM 512
+Dropout 0.1
+Dense 16 - activation='sigmoid'
+Dense 1
+{'lr': 0.001,
+'loss': 'mean_squared_error',
+'activation': 'tanh',
+'recurrent_activation': 'sigmoid',
+'epochs': 50,
+'batch_size': 75,
+'d': 20,
+'name': 'LSTM-deep'}
+
+lstm_roonetal.py
+LSTM 128 - bias_initializer='glorot_uniform'
+LSTM 64 - bias_initializer='glorot_uniform'
+Dense 16 - bias_initializer='glorot_uniform'
+Dense 1 - bias_initializer='glorot_uniform'
+{'lr': 0.001,
+'loss': 'root_mean_squared_error',
+'activation': 'tanh',
+'epochs': 250 or 500,
+'batch_size': 150,
+'d': 22,
+'train_columns': ['close'],
+'label_column': 'close', 
+'name': '0_LSTM_Roonetal-StdWin-NotRound-500',
+'discretization': False,
+'fill_method': 'previous',
+'normalization': False,
+'window_scaling': True}
+
+-------
+--Old--
+-------
+Simple RNN:
+3 SimpleRNN layers with 32 inputs. Returns full sequence. Drop out of 0.2 after each of these layers.
+1 SimpleRNN layer with 32 inputs. Does not return full sequence
+1 Dense layer with 1 input. 
+input -> 32 -> 32 -> 32 -> 32noFS -> 1
+Activation: elu
+Kernel Initializer: Glorot Uniform
+Recurrent Initializer: Orthogonal
+Bias Initializer: Zeros
+Optimizer = RMSProp
+
+Groovy RNN:
+3 GRU layers with 50 inputs. Returns full sequence. Drop out of 0.2 after each of these layers.
+1 GRU layer with 50 inputs. Does not return full sequence
+1 Dense layer with 1 input.
+input -> 50 -> 50 -> 50 -> 50noFS ->1
+Activation: elu
+Kernel Initializer: Glorot Uniform
+Recurrent Initializer: Orthogonal
+Bias Initializer: Zeros
+Optimizer = RMSProp
+
+Loovy RNN:
+3 LSTM layers with 50 inputs. Returns full sequence. Drop out of 0.2 after each of these layers.
+1 LSTM layer with 50 inputs. Does not return full sequence
+1 Dense layer with 1 input.
+input -> 50 -> 50 -> 50 -> 50noFS ->1
+Activation: elu
+Kernel Initializer: Glorot Uniform
+Recurrent Initializer: Orthogonal
+Bias Initializer: Zeros
+Optimizer = RMSProp
+
+Super Groovy RNN:
+6 GRU layers with 50 inputs. Returns full sequence. Drop out of 0.2 after each of these layers.
+1 GRU layer with 50 inputs. Does not return full sequence
+1 Dense layer with 1 input.
+input -> 50 -> 50 -> 50 -> 50noFS ->1
+Activation: elu
+Kernel Initializer: Glorot Uniform
+Recurrent Initializer: Orthogonal
+Bias Initializer: Zeros
+Optimizer = RMSProp
+
+Super Loovy RNN:
+6 LSTM layers with 50 inputs. Returns full sequence. Drop out of 0.2 after each of these layers.
+1 LSTM layer with 50 inputs. Does not return full sequence
+1 Dense layer with 1 input.
+input -> 50 -> 50 -> 50 -> 50noFS ->1
+Activation: elu
+Kernel Initializer: Glorot Uniform
+Recurrent Initializer: Orthogonal
+Bias Initializer: Zeros
+Optimizer = RMSProp
