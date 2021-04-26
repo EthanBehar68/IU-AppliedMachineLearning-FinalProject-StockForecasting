@@ -2,7 +2,7 @@ from fastquant import get_stock_data
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from keras.models import Sequential
 from keras.layers import Dense, SimpleRNN, LSTM, Dropout
 from keras.optimizers import Adam
@@ -18,17 +18,28 @@ class LSTMModel(Model):
         self.recurrent_activation = params['recurrent_activation']
         self.epochs = params['epochs']
         self.batch_size = params['batch_size']
+        self.scale_type = params['scale_type']
         self.d = params['d']
 
     def train(self, train_data):
         # save train data and scaler obj because we will need it for testing
         self.train_obs = self.data_prep(train_data).values
-        self.scaler = MinMaxScaler(feature_range=(0,1))
+
+        if self.scale_type == 'minmax':
+            self.scaler = MinMaxScaler(feature_range=(0,1))
+        else:
+            self.scaler = StandardScaler()
+
         self.scaler = self.scaler.fit(self.train_obs)
         self.train_obs = self.scaler.transform(self.train_obs)
 
         self.train_labels = self.data_prep(train_data)['fracChange'].values.reshape(-1,1)
-        self.scaler_out = MinMaxScaler(feature_range=(0,1))
+        
+        if self.scale_type == 'minmax':
+            self.scaler_out = MinMaxScaler(feature_range=(0,1))
+        else:
+            self.scaler_out = StandardScaler()
+
         self.scaler_out = self.scaler_out.fit(self.train_labels)
         self.train_labels = self.scaler_out.transform(self.train_labels)
         
@@ -41,8 +52,6 @@ class LSTMModel(Model):
         
         x_train,y_train = np.array(x_train), np.array(y_train)
         y_train = np.reshape(y_train, (*y_train.shape, 1))
-
-        print(y_train.shape)
 
         # build the model
         self.model = self.gen_model()
@@ -105,16 +114,18 @@ if __name__ == "__main__":
               'epochs': 50,
               'batch_size': 75,
               'd': 20,
-              'name': 'LSTM-adv'}
+              'scale_type': 'minmax',
+              'name': 'LSTM-adv-std'}
     
     print('paper tests')
-    test = Test(Model=LSTMModel, params=params, tests=paper_tests, f='lstm-adv-paper-tests.json', plot=True)
+    test = Test(Model=LSTMModel, params=params, tests=paper_tests, f='lstm-std-adv-paper-tests.json', plot=True)
     test.fixed_origin_tests()
 
-    # print('own tests')
-    # test = Test(Model=LSTMModel, params=params, tests=own_tests, f='lstm-adv-own-tests.json', plot=True)
-    # test.fixed_origin_tests()
+    print('own tests')
+    test = Test(Model=LSTMModel, params=params, tests=own_tests, f='lstm-adv-own-tests.json', plot=True)
+    test.fixed_origin_tests()
 
-    # print('testing')
-    # test = Test(Model=LSTMModel, params=params, tests=rolling_window_tests, f='lstm-adv-rolling-tests.json', plot=True)
-    # test.rolling_window_test()
+    print('testing')
+    test = Test(Model=LSTMModel, params=params, tests=rolling_window_tests, f='lstm-std-adv-rolling-tests.json', plot=True)
+    test.rolling_window_test()
+
