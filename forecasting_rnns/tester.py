@@ -3,9 +3,6 @@ from lstm_roondiwalaetal import *
 from lstm_pawaretal import *
 from lstm_mogharetal import *
 from lstm_behar import *
-# File Structure
-# Roondiwala Tests
-
 
 if __name__ == "__main__":
 ####################
