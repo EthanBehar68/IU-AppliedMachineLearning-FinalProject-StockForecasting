@@ -1,3 +1,5 @@
+# ds store file for apple
+.DS_Store
 # ignore API tokens
 tokens.txt
 # vscode junk
