@@ -164,6 +164,10 @@ class LSTM_Behar(Model):
 
 
 if __name__ == "__main__":
+    
+    # Use the tester files for running tests
+    # This should be used only to make sure its working.
+
     # ['close'] Test
     # Naming syntax please use
     # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Rolling/Fixed}
