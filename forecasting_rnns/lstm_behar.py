@@ -157,9 +157,9 @@ class LSTM_Behar(Model):
         model.add(Dropout(0.1))
         model.add(LSTM(256, return_sequences=False))
         model.add(Dropout(0.1))
-        model.add(Dense(64, init='uniform', activation='relu'))
+        model.add(Dense(64, activation='relu'))
         model.add(Dropout(0.1))
-        model.add(Dense(1, init='uniform', activation='linear'))
+        model.add(Dense(1, activation='linear'))
         return model
 
 

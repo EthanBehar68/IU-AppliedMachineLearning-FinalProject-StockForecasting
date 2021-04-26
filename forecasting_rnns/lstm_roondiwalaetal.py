@@ -156,12 +156,14 @@ class LSTM_RoondiwalaEtAl(Model):
         model = Sequential()
         model.add(LSTM(128, input_shape=(self.d, len(self.train_columns)), return_sequences=True))
         model.add(LSTM(64, return_sequences=False))
-        model.add(Dense(16, init='uniform', activation='relu'))
-        model.add(Dense(1, init='uniform', activation='linear'))
+        model.add(Dense(16, activation='relu'))
+        model.add(Dense(1, activation='linear'))
         return model
 
 
 if __name__ == "__main__":
+    # Use the tester files for running tests
+    # This should be used only to make sure its working.
     # ['close'] Test
     # Naming syntax please use
     # {Paper}-{Std/Norm}-{Win/''}-{Discr/''}-{epoch}-{train columns}
@@ -175,69 +177,6 @@ if __name__ == "__main__":
                 'train_columns': ['close'],
                 'label_column': 'close', 
                 'name': 'Roondiwala-Std-250-Close', 
-                'discretization': False, # Use value rounding?
-                'fill_method': 'previous', # fillna method='pa'
-                'normalization': False, # Normalize or standardization?
-                'window_scaling': False } # Window scaling or bulk scaling?
-    
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
-    test.rolling_window_test('./imgs/4-25-etb/')
-
-    # ['open', 'close'] Test
-    # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Discr/''}-{epoch}-{train columns}
-    params = {'lr': 0.001, # learning rate
-                'loss': 'mean_absolute_percentage_error', # Loss function
-                'activation': 'tanh', # Not used
-                'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
-                'batch_size': 150,
-                'd': 22, # Taken from Roonwidala et al.
-                'train_columns': ['open', 'close'],
-                'label_column': 'close', 
-                'name': 'Roondiwala-Std-250-OpenClose', 
-                'discretization': False, # Use value rounding?
-                'fill_method': 'previous', # fillna method='pa'
-                'normalization': False, # Normalize or standardization?
-                'window_scaling': False } # Window scaling or bulk scaling?
-    
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
-    test.rolling_window_test('./imgs/4-25-etb/')
-
-    # ['high', 'low', 'close'] Test
-    # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Discr/''}-{epoch}-{train columns}
-    params = {'lr': 0.001, # learning rate
-                'loss': 'mean_absolute_percentage_error', # Loss function
-                'activation': 'tanh', # Not used
-                'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
-                'batch_size': 150,
-                'd': 22, # Taken from Roonwidala et al.
-                'train_columns': ['high', 'low', 'close'],
-                'label_column': 'close', 
-                'name': 'Roondiwala-Std-250-HighLowClose', 
-                'discretization': False, # Use value rounding?
-                'fill_method': 'previous', # fillna method='pa'
-                'normalization': False, # Normalize or standardization?
-                'window_scaling': False } # Window scaling or bulk scaling?
-    
-    test = Test(Model=LSTM_RoondiwalaEtAl, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
-    test.rolling_window_test('./imgs/4-25-etb/')
-
-    # ['high', 'low', 'open', 'close'] Test
-    # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Discr/''}-{epoch}-{train columns}
-    params = {'lr': 0.001, # learning rate
-                'loss': 'mean_absolute_percentage_error', # Loss function
-                'activation': 'tanh', # Not used
-                'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 250, #250/500
-                'batch_size': 150,
-                'd': 22, # Taken from Roonwidala et al.
-                'train_columns': ['high', 'low', 'open', 'close'],
-                'label_column': 'close', 
-                'name': 'Roondiwala-Std-250-HighLowOpenClose', 
                 'discretization': False, # Use value rounding?
                 'fill_method': 'previous', # fillna method='pa'
                 'normalization': False, # Normalize or standardization?
