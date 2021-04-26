@@ -3,19 +3,37 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
+
+
+'''
 df = get_stock_data("AAPL", "2001-03-26", "2021-03-26")
 #print(df.head())
 #print(df['open'][0])
-res = backtest('buynhold', df)
+
+
+res = backtest("buynhold", df, verbose=0, plot=False)
+
 print(res.info())
 
-
-#res = backtest("rsi", df, rsi_period=14, rsi_upper=70, rsi_lower=30)
 #res = backtest('macd', df, fast_period=15, slow_period=40, signal_period=9, sma_period=30, dir_period=10)
 #res = backtest('bbands', df, period=20, devfactor=2.0) 
 #print(res[['fast_period', 'slow_period', 'final_value']].head())
+#print(type(res))
 #print(res.info())
 
+for key in history.keys():
+    print('[][][][][][][][][][][][][][][][][][][]')
+    print(key)
+    print(history[key].info())
+
+
+for key in history.keys():
+    print(history[key].head())
+
+
+'''
 stock_tickers = ['AAPL', 'TSLA', 'GOOG']
 crypto_tickers = ['BTC-USD', 'ETH-USD', 'XRP-USD']
 
@@ -103,58 +121,133 @@ Data columns (total 29 columns):
  27  pnl                1 non-null      float64
  28  final_value        1 non-null      float64  $
 '''
-
-
 start_date = 0
 end_date = 0
+
+
+def buynhold():
+    res, history = backtest('buynhold', 
+                            df,
+                            plot=False,
+                            return_history=True,
+                            commission=0,
+                            verbose=0)
+
+    final = float(res['final_value'])
+    init = float(res['init_cash'])
+
+    percent_gain = (final-init)/init
+    #print(len(res.columns))
+    #print(res.columns)
+    #print(res.info())
+    curr = {
+        'percent_gain': percent_gain
+    }
+    
+    return curr
+
 def rsi(period, upper, lower):
-    res = backtest('rsi', df, rsi_period=period, rsi_upper=upper, rsi_lower=lower)
-    percent_gain = (res[29]-res[1])/res[1]
+    res, history = backtest('rsi', 
+                            df, 
+                            rsi_period=period, 
+                            rsi_upper=upper, 
+                            rsi_lower=lower, 
+                            plot=False, 
+                            return_history=True, 
+                            commission=0,
+                            verbose=0)
+
+
+
+    final = float(res['final_value'])
+    init = float(res['init_cash'])
+
+    percent_gain = (final-init)/init
 
     curr = {
         'percent_gain': percent_gain,
         'rsi_period': period,
         'rsi_upper': upper,
-        'rsi_lower': lower
+        'rsi_lower': lower,
+        'orders': history['orders']
     }
 
     return curr
 
 def smac(fast, slow):
-    res = backtest('smac', df, fast_period=fast, slow_period=slow) 
-    init_cash = res[1]
-    final_value = res[28]
-    percent_gain = (final_value-init_cash)/init_cash
+    res, history = backtest('smac', 
+                            df, 
+                            fast_period=fast, 
+                            slow_period=slow,
+                            plot=False,
+                            return_history=True,
+                            commission=0,
+                            verbose=0) 
+
+    final = float(res['final_value'])
+    init = float(res['init_cash'])
+
+    percent_gain = (final-init)/init
 
     curr = {
         'percent_gain': percent_gain,
         'fast_period': fast,
         'slow_period': slow,
         'start': start_date,
-        'end': end_date
+        'end': end_date,
+        'orders': history['orders']
     }
 
     return curr
 
 def emac(fast, slow):
-    res = backtest('emac', df, fast_period=fast, slow_period=slow) 
-    init_cash = res[1]
-    final_value = res[28]
-    percent_gain = (final_value-init_cash)/init_cash
+    res, history = backtest('emac', 
+                            df, 
+                            fast_period=fast, 
+                            slow_period=slow,
+                            plot=False,
+                            return_history=True,
+                            commission=0,
+                            verbose=0
+                            ) 
+
+
+    final = float(res['final_value'])
+    init = float(res['init_cash'])
+
+    percent_gain = (final-init)/init
 
     curr = {
         'percent_gain': percent_gain,
         'fast_period': fast,
         'slow_period': slow,
         'start': start_date,
-        'end': end_date
+        'end': end_date,
+        'orders': history['orders']
     }
 
     return curr
-def macd(fast, slow, signal, sma, dir):
-    res = backtest('macd', df, fast_period=fast, slow_period=slow, signal_period=signal, sma_period=sma, dir_period=dir)
 
-    percent_gain = (res[31]-res[1])/res[1]
+
+
+def macd(fast, slow, signal, sma, dir):
+    res, history = backtest('macd', 
+                            df, 
+                            fast_period=fast, 
+                            slow_period=slow, 
+                            signal_period=signal, 
+                            sma_period=sma, 
+                            dir_period=dir,
+                            plot=False,
+                            return_history=True,
+                            commission=0,
+                            verbose=0)
+
+
+    final = float(res['final_value'])
+    init = float(res['init_cash'])
+
+    percent_gain = (final-init)/init
     
     curr = {
         'percent_gain': percent_gain,
@@ -162,20 +255,35 @@ def macd(fast, slow, signal, sma, dir):
         'slow_period': slow,
         'signal_period': signal,
         'sma_period': sma,
-        'dir_period': dir
+        'dir_period': dir,
+        'orders': history['orders']
     }
 
     return curr
-def bbands(period, dev):
-    res = backtest(key, df, period=period, devfactor=dev) 
 
-    percent_gain = (res[28]-res[1])/res[1]
+
+def bbands(period, dev):
+    res, history = backtest('bbands', 
+                            df, 
+                            period=period, 
+                            devfactor=dev,
+                            plot=False,
+                            return_history=True,
+                            commission=0,
+                            verbose=0)
+
+    final = float(res['final_value'])
+    init = float(res['init_cash'])
+
+    percent_gain = (final-init)/init
 
     curr = {
         'percent_gain': percent_gain,
         'period': period,
-        'devfactor': dev
+        'devfactor': dev,
+        'orders': history['orders']
     }
+
     return curr
 
 buynhold_results = []
@@ -192,21 +300,28 @@ for i, ticker in enumerate(stock_tickers.keys()):
     
     df = get_stock_data(ticker, start_date, end_date)
 
-    print(df)
     for i, key in enumerate(strats.keys()):
         parameters = strats[key]
         # python doesn't have a switch statement function which is lame
         if key == 'buynhold':
-            res = backtest(key, df)
+            res = buynhold()
+            res['ticker'] = ticker
+            res['start_date'] = start_date
+            res['end_date'] = end_date
+            buynhold_results.append(res)
             
         elif key == 'rsi':
             res = rsi(parameters['rsi_period'], parameters['rsi_upper'], parameters['rsi_lower'])
             res['ticker'] = ticker
+            res['start_date'] = start_date
+            res['end_date'] = end_date
             rsi_results.append(res)
 
         elif key == 'smac':
             res = smac(parameters['fast_period'], parameters['slow_period'])
             res['ticker'] = ticker
+            res['start_date'] = start_date
+            res['end_date'] = end_date
             smac_results.append(res) 
 
         elif key == 'emac':
@@ -214,6 +329,8 @@ for i, ticker in enumerate(stock_tickers.keys()):
             slow = parameters['slow_period']
             res = emac(fast, slow)
             res['ticker'] = ticker
+            res['start_date'] = start_date
+            res['end_date'] = end_date
             emac_results.append(res)
 
         elif key == 'macd':
@@ -225,6 +342,8 @@ for i, ticker in enumerate(stock_tickers.keys()):
 
             res = macd(fast, slow, signal, sma, dir)
             res['ticker'] = ticker
+            res['start_date'] = start_date
+            res['end_date'] = end_date
             macd_results.append(res)
             
         elif key == 'bbands':
@@ -233,6 +352,23 @@ for i, ticker in enumerate(stock_tickers.keys()):
 
             res = bbands(period, dev) 
             res['ticker'] = ticker
+            res['start_date'] = start_date
+            res['end_date'] = end_date
             bbands_results.append(res)
         else:
-            print('invalid key in the strats dictionary: {}'.format(key))
+            print(f'invalid key in the strats dictionary: {key}')
+
+
+print(type(rsi_results[0]['percent_gain']))
+
+buynhold_results = sorted(buynhold_results, key=lambda x: x['percent_gain'], reverse=True)
+rsi_results = sorted(rsi_results, key=lambda x: x['percent_gain'], reverse=True)
+smac_results = sorted(smac_results, key=lambda x: x['percent_gain'], reverse=True)
+emac_results = sorted(emac_results, key=lambda x: x['percent_gain'], reverse=True)
+macd_results = sorted(macd_results, key=lambda x: x['percent_gain'], reverse=True)
+bbands_results = sorted(bbands_results, key=lambda x: x['percent_gain'], reverse=True)
+
+
+print(buynhold_results)
+print(rsi_results)
+print(smac_results)
