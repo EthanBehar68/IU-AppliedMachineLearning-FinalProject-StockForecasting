@@ -55,29 +55,140 @@ stock_tickers = {
 strats = {
     'buynhold':{},
     'rsi': {
-        'rsi_period': 14,
-        'rsi_upper': 70,
-        'rsi_lower': 30
+        'rsi1': {
+            'rsi_period': 14,
+            'rsi_upper': 70,
+            'rsi_lower': 30
+        },
+       'rsi2': {
+            'rsi_period': 14,
+            'rsi_upper': 60,
+            'rsi_lower': 40
+        }, 
+        'rsi3': {
+            'rsi_period': 20,
+            'rsi_upper': 70,
+            'rsi_lower': 30
+        },
+        'rsi4': {
+            'rsi_period': 20,
+            'rsi_upper': 60,
+            'rsi_lower': 40
+        }, 
+        'rsi5': {
+            'rsi_period': 16,
+            'rsi_upper': 65,
+            'rsi_lower': 35
+        }, 
     },
     'smac': {
-        'slow_period': 40,
-        'fast_period': 15 
+        'smac1': {
+            'slow_period': 40,
+            'fast_period': 15 
+        },
+       'smac2': {
+            'slow_period': 45,
+            'fast_period': 20 
+        }, 
+        'smac3': {
+            'slow_period': 50,
+            'fast_period': 25 
+        },
+        'smac4': {
+            'slow_period': 30,
+            'fast_period': 10 
+        },
+        'smac5': {
+            'slow_period': 30,
+            'fast_period': 15 
+        },
     },
     'emac': {
-        'slow_period': 40,
-        'fast_period': 15
+        'emac1':{
+            'slow_period': 40,
+            'fast_period': 15
+        },
+        'emac2':{
+            'slow_period': 45,
+            'fast_period': 20
+        },
+        'emac3':{
+            'slow_period': 50,
+            'fast_period': 25
+        },
+        'emac4':{
+            'slow_period': 30,
+            'fast_period': 10
+        },
+        'emac5':{
+            'slow_period': 30,
+            'fast_period': 15
+        },
+        
     },
     'macd': {
-        'slow_period': 40, 
-        'fast_period': 15,
-        'signal_period': 9,
-        'sma_period': 30,
-        'dir_period': 10
+        'macd1':{
+            'slow_period': 40, 
+            'fast_period': 15,
+            'signal_period': 9,
+            'sma_period': 30,
+            'dir_period': 10
+        },
+       'macd2':{
+            'slow_period': 45, 
+            'fast_period': 20,
+            'signal_period': 9,
+            'sma_period': 30,
+            'dir_period': 10
+        }, 
+        'macd3':{
+            'slow_period': 50, 
+            'fast_period': 25,
+            'signal_period': 9,
+            'sma_period': 30,
+            'dir_period': 10
+        },
+        'macd4':{
+            'slow_period': 30, 
+            'fast_period': 10,
+            'signal_period': 9,
+            'sma_period': 30,
+            'dir_period': 10
+        },
+        'macd5':{
+            'slow_period': 30, 
+            'fast_period': 15,
+            'signal_period': 9,
+            'sma_period': 30,
+            'dir_period': 10
+        }
     },
     'bbands': {
-        'period': 20,
-        'devfactor': 2.0
-    },
+        'bbands1': {
+            'period': 20,
+            'devfactor': 2.0
+        },
+       'bbands2': {
+            'period': 30,
+            'devfactor': 2.0
+        }, 
+        'bbands3': {
+            'period': 40,
+            'devfactor': 2.0
+        },
+        'bbands4': {
+            'period': 20,
+            'devfactor': 1.5
+        },
+        'bbands5': {
+            'period': 20,
+            'devfactor': 2.5
+        },
+        'bbands6': {
+            'period': 30,
+            'devfactor': 2.5
+        },
+    }
 }
 
 
@@ -169,7 +280,7 @@ def rsi(period, upper, lower):
         'rsi_period': period,
         'rsi_upper': upper,
         'rsi_lower': lower,
-        'orders': history['orders']
+    #   'orders': history['orders']
     }
 
     return curr
@@ -195,7 +306,7 @@ def smac(fast, slow):
         'slow_period': slow,
         'start': start_date,
         'end': end_date,
-        'orders': history['orders']
+    #    'orders': history['orders']
     }
 
     return curr
@@ -223,7 +334,7 @@ def emac(fast, slow):
         'slow_period': slow,
         'start': start_date,
         'end': end_date,
-        'orders': history['orders']
+    #    'orders': history['orders']
     }
 
     return curr
@@ -256,7 +367,7 @@ def macd(fast, slow, signal, sma, dir):
         'signal_period': signal,
         'sma_period': sma,
         'dir_period': dir,
-        'orders': history['orders']
+    #    'orders': history['orders']
     }
 
     return curr
@@ -281,7 +392,7 @@ def bbands(period, dev):
         'percent_gain': percent_gain,
         'period': period,
         'devfactor': dev,
-        'orders': history['orders']
+    #    'orders': history['orders']
     }
 
     return curr
@@ -300,63 +411,65 @@ for i, ticker in enumerate(stock_tickers.keys()):
     
     df = get_stock_data(ticker, start_date, end_date)
 
-    for i, key in enumerate(strats.keys()):
-        parameters = strats[key]
-        # python doesn't have a switch statement function which is lame
-        if key == 'buynhold':
-            res = buynhold()
-            res['ticker'] = ticker
-            res['start_date'] = start_date
-            res['end_date'] = end_date
-            buynhold_results.append(res)
-            
-        elif key == 'rsi':
-            res = rsi(parameters['rsi_period'], parameters['rsi_upper'], parameters['rsi_lower'])
-            res['ticker'] = ticker
-            res['start_date'] = start_date
-            res['end_date'] = end_date
-            rsi_results.append(res)
+    for j, key in enumerate(strats.keys()):
+        strategy = strats[key]
+        for k, specific_strat in enumerate(strats[key].keys()):
+            parameters = strategy[specific_strat]
+            # python doesn't have a switch statement function which is lame
+            if key == 'buynhold':
+                res = buynhold()
+                res['ticker'] = ticker
+                res['start_date'] = start_date
+                res['end_date'] = end_date
+                buynhold_results.append(res)
+                
+            elif key == 'rsi':
+                res = rsi(parameters['rsi_period'], parameters['rsi_upper'], parameters['rsi_lower'])
+                res['ticker'] = ticker
+                res['start_date'] = start_date
+                res['end_date'] = end_date
+                rsi_results.append(res)
 
-        elif key == 'smac':
-            res = smac(parameters['fast_period'], parameters['slow_period'])
-            res['ticker'] = ticker
-            res['start_date'] = start_date
-            res['end_date'] = end_date
-            smac_results.append(res) 
+            elif key == 'smac':
+                res = smac(parameters['fast_period'], parameters['slow_period'])
+                res['ticker'] = ticker
+                res['start_date'] = start_date
+                res['end_date'] = end_date
+                smac_results.append(res) 
 
-        elif key == 'emac':
-            fast = parameters['fast_period']
-            slow = parameters['slow_period']
-            res = emac(fast, slow)
-            res['ticker'] = ticker
-            res['start_date'] = start_date
-            res['end_date'] = end_date
-            emac_results.append(res)
+            elif key == 'emac':
+                fast = parameters['fast_period']
+                slow = parameters['slow_period']
+                res = emac(fast, slow)
+                res['ticker'] = ticker
+                res['start_date'] = start_date
+                res['end_date'] = end_date
+                emac_results.append(res)
 
-        elif key == 'macd':
-            fast = parameters['fast_period']
-            slow = parameters['slow_period']
-            signal = parameters['signal_period']
-            sma = parameters['sma_period']
-            dir = parameters['dir_period']
+            elif key == 'macd':
+                fast = parameters['fast_period']
+                slow = parameters['slow_period']
+                signal = parameters['signal_period']
+                sma = parameters['sma_period']
+                dir = parameters['dir_period']
 
-            res = macd(fast, slow, signal, sma, dir)
-            res['ticker'] = ticker
-            res['start_date'] = start_date
-            res['end_date'] = end_date
-            macd_results.append(res)
-            
-        elif key == 'bbands':
-            period = parameters['period']
-            dev = parameters['devfactor']
+                res = macd(fast, slow, signal, sma, dir)
+                res['ticker'] = ticker
+                res['start_date'] = start_date
+                res['end_date'] = end_date
+                macd_results.append(res)
+                
+            elif key == 'bbands':
+                period = parameters['period']
+                dev = parameters['devfactor']
 
-            res = bbands(period, dev) 
-            res['ticker'] = ticker
-            res['start_date'] = start_date
-            res['end_date'] = end_date
-            bbands_results.append(res)
-        else:
-            print(f'invalid key in the strats dictionary: {key}')
+                res = bbands(period, dev) 
+                res['ticker'] = ticker
+                res['start_date'] = start_date
+                res['end_date'] = end_date
+                bbands_results.append(res)
+            else:
+                print(f'invalid key in the strats dictionary: {key}')
 
 
 print(type(rsi_results[0]['percent_gain']))
@@ -369,6 +482,11 @@ macd_results = sorted(macd_results, key=lambda x: x['percent_gain'], reverse=Tru
 bbands_results = sorted(bbands_results, key=lambda x: x['percent_gain'], reverse=True)
 
 
+print('buynhold =========================================')
 print(buynhold_results)
+print()
+print('rsi =========================================')
 print(rsi_results)
+print()
+print('smac =========================================')
 print(smac_results)
