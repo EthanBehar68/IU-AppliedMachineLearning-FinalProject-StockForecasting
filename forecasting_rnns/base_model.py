@@ -1,14 +1,17 @@
+# Abstract functionality
 from abc import ABC, abstractmethod
+# Data Pre-processing
 from fastquant import get_stock_data
-import numpy as np
-import pandas as pd
+# General Needed libraries
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 import math
 import os
 
 
 #Base model class
-class Model(ABC):
+class Base_Model(ABC):
 
     # params should be a dict of your parameters that you want to pass to the model
     # name should be a string (used for saving results)
@@ -20,6 +23,13 @@ class Model(ABC):
     # wrapper model function for collecting fastquant data
     def get_data(self, ticker, start_date, end_date):
         return get_stock_data(ticker, start_date, end_date)
+
+    # function to get error of the model based on preds and true values
+    def mean_abs_percent_error(self, y_pred, y_true):
+        return (1.0)/(len(y_pred))*((np.abs(y_pred-y_true)/np.abs(y_true))*100).sum()
+
+    def root_mean_squared_error(self, y_pred, y_true):
+        return np.sqrt(np.mean(np.square(y_pred - y_true)))
 
     # plotting function for standardized plot results
     def plot_loss(self, t_loss, v_loss, title, folder='./imgs/'):
@@ -76,21 +86,3 @@ class Model(ABC):
         ax.yaxis.grid(True,ls='--')
         ax.legend()
         plt.savefig(f'../imgs/{title}.png')
-
-    # function to get error of the model based on preds and true values
-    def mean_abs_percent_error(self, y_pred, y_true):
-        return (1.0)/(len(y_pred))*((np.abs(y_pred-y_true)/np.abs(y_true))*100).sum()
-
-    def root_mean_squared_error(self, y_pred, y_true):
-        return np.sqrt(np.mean(np.square(y_pred - y_true)))
-
-    # training function for the model, should create the model, train it, and store in self.model
-    @abstractmethod
-    def train(self, train_data):
-        pass
-    
-    # prediction function for the model, should return the preds and y_true given the test data
-    @abstractmethod
-    def predict(self, test_data):
-        # return preds,actual
-        pass

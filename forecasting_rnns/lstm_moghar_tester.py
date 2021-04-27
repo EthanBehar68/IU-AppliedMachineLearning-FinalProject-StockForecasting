@@ -1,5 +1,7 @@
 from test import *
-from lstm_mogharetal import *
+from lstm_moghar import *
+from X_train_predictor import *
+
 
 if __name__ == "__main__":
 ####################
@@ -20,8 +22,7 @@ if __name__ == "__main__":
                 'name': 'Moghar-Std-100-Open', 
                 'discretization': False,
                 'fill_method': 'previous',
-                'normalization': False,
-                'window_scaling': False }
+                'normalization': False }
     
-    test = Test(Model=LSTM_MogharEtAl, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
+    test = Test(Model=LSTM_Moghar, Train_Predictor=X_Train_Predictor, params=params, tests=window_heavy_hitters_tests,plot=True)
     test.rolling_window_test('./forecasting_rnns/results/Moghar-Std-100-Open/')

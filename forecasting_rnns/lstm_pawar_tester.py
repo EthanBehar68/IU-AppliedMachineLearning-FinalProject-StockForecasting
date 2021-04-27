@@ -1,5 +1,6 @@
 from test import *
-from lstm_pawaretal import *
+from lstm_pawar import *
+from X_train_predictor import *
 
 if __name__ == "__main__":
 ####################
@@ -19,8 +20,7 @@ if __name__ == "__main__":
                 'name': 'Pawar-Std-100-Close', 
                 'discretization': False,
                 'fill_method': 'previous',
-                'normalization': False,
-                'window_scaling': False }
+                'normalization': False }
     
-    test = Test(Model=LSTM_PawarEtAl, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
+    test = Test(Model=LSTM_Pawar, Train_Predictor=X_Train_Predictor, params=params, tests=window_heavy_hitters_tests,plot=True)
     test.rolling_window_test('./forecasting_rnns/results/Pawar-Std-100-Close/')

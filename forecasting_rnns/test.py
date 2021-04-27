@@ -1,10 +1,9 @@
-import json
 from fastquant import get_stock_data
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import json
 import math
-from lstm_roondiwalaetal import *
 
 heavy_hitters_tests = {
     'test1': {
@@ -13,38 +12,39 @@ heavy_hitters_tests = {
         'test':
             {'ticker':'F', 'start':'2015-01-02', 'end':'2016-02-23'}
     }
-    # ,
-    # 'test2': {
-    #     'train':
-    #         {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'}, # Microsoft
-    #     'test':
-    #         {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
-    # },
-    # 'test3': {
-    #     'train':
-    #         {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'}, # Amazon
-    #     'test':
-    #         {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
-    # },
-    # 'test4': {
-    #     'train':
-    #         {'ticker':'MRK', 'start':'2007-01-01', 'end':'2015-01-01'}, # Merck & Co.
-    #     'test':
-    #         {'ticker':'MRK', 'start':'2015-01-02', 'end':'2016-01-02'}
-    # },
-    # 'test5': {
-    #     'train':
-    #         {'ticker':'NKE', 'start':'2007-01-01', 'end':'2015-01-01'}, # Nike
-    #     'test':
-    #         {'ticker':'NKE', 'start':'2015-01-02', 'end':'2016-01-02'}
-    # }
+    ,
+    'test2': {
+        'train':
+            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'}, # Microsoft
+        'test':
+            {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test3': {
+        'train':
+            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'}, # Amazon
+        'test':
+            {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test4': {
+        'train':
+            {'ticker':'MRK', 'start':'2007-01-01', 'end':'2015-01-01'}, # Merck & Co.
+        'test':
+            {'ticker':'MRK', 'start':'2015-01-02', 'end':'2016-01-02'}
+    },
+    'test5': {
+        'train':
+            {'ticker':'NKE', 'start':'2007-01-01', 'end':'2015-01-01'}, # Nike
+        'test':
+            {'ticker':'NKE', 'start':'2015-01-02', 'end':'2016-01-02'}
+    }
 }
 
 window_heavy_hitters_tests = {
     'test1': {
         'window':
             {'ticker':'F', 'start':'2007-01-01', 'end':'2016-02-23'} # Ford
-    },
+    }
+    ,
     'test2': {
         'window':
             {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2016-02-23'}, # Amazon
@@ -139,60 +139,62 @@ rolling_window_tests = {
 }
 
 class Test:
-    def __init__(self, Model, params, tests, f, plot=False):
+    def __init__(self, Model, Train_Predictor, params, tests, plot=False):
         self.Model = Model
+        self.Train_Predictor = Train_Predictor
         self.params = params
         self.tests = tests
         self.results = {}
-        self.f = f
         self.plot = plot
     
-    def fixed_origin_tests(self):
+    def fixed_origin_tests(self, folder):
         for test in self.tests.values():
             training_params = test['train']
             testing_params = test['test']
 
             ticker = training_params['ticker']
 
-            # make the model
-            self.model = self.Model(params=self.params)
+            # Make the model and train_predictor
+            self.model_class = self.Model(params=self.params)
+            self.model = self.model_class.gen_model()
+            self.train_predictor = self.Train_Predictor(params=self.params)
 
             # collect data from fastquant/quandl
-            train_data = self.model.get_data(ticker=ticker,
+            train_data = self.model_class.get_data(ticker=ticker,
                                         start_date=training_params['start'],
                                         end_date=training_params['end'])
 
-            test_data = self.model.get_data(ticker=ticker,
+            test_data = self.model_class.get_data(ticker=ticker,
                                        start_date=testing_params['start'],
                                        end_date=testing_params['end'])
 
             # train and predict
-            model_history = self.model.train(train_data=train_data)
-            preds, actuals = self.model.predict(test_data=test_data)
+            self.model, model_history = self.train_predictor.train(model=self.model, train_data=train_data, label_column_index=self.model_class.label_column_index)
+            preds, actuals = self.train_predictor.predict(model=self.model, test_data=test_data, label_column_index=self.model_class.label_column_index)
 
             # print(model_history.history['loss'])
             # print(model_history.history['val_loss'])
 
             # get error for this window
             if self.params['loss'] == "mean_absolute_percentage_error": # updated to keras' name for the loss
-                error = self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                error = self.model_class.mean_abs_percent_error(y_pred=preds, y_true=actuals)
             elif self.params['loss'] == "root_mean_squared_error":
-                error = self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
+                error = self.model_class.root_mean_squared_error(y_pred=preds, y_true=actuals)
             else:
                 raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
 
-            self.results[f'{self.model.name}:{ticker}'] = error
+            self.results[f'{self.model_class.name}:{ticker}'] = error
 
             # plot results if flag is set
             if self.plot:
-                self.model.plot_results(preds=preds, actual=actuals,
-                                        title=f'{self.model.name} {ticker.replace("/", "-")} forcasted vs actual stock prices {testing_params["start"]} to {testing_params["end"]}')
+                self.model_class.plot_results(preds=preds, actual=actuals, title=f'{self.model_class.name} {ticker} forcasted vs actual stock prices {testing_params["start"]} to {testing_params["end"]}', folder=folder)
                 if model_history is not None:
-                    self.model.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'],
-                                        title=f'{self.model.name} {ticker.replace("/", "-")} train vs validation loss {testing_params["start"]} to {testing_params["end"]}')
+                    self.model_class.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'], title=f'{self.model_class.name} {ticker} train vs validation loss {testing_params["start"]} to {testing_params["end"]}', folder=folder)
+
         # write errors to file
+        json_file = f'{folder}{self.model_class.name}.json'
         dump = json.dumps(self.results)
-        output_file = open(self.f, 'w')
+        output_file = open(json_file, 'w')
         output_file.write(dump)
         output_file.close()
 
@@ -222,18 +224,20 @@ class Test:
 
                 # print(f'window {i+1}')
 
-                # make the model
-                self.model = self.Model(params=self.params)
+                # Make the model and train_predictor
+                self.model_class = self.Model(params=self.params)
+                self.model = self.model_class.gen_model()
+                self.train_predictor = self.Train_Predictor(params=self.params)
 
                 # train and predict
-                model_history = self.model.train(train_data=train_data, rolling_window_test=True)
-                preds, actuals = self.model.predict(test_data=test_data, rolling_window_test=True)
+                self.model, model_history = self.train_predictor.train(model=self.model, train_data=self.model_class.preprocess_data(train_data), label_column_index=self.model_class.label_column_index)
+                preds, actuals = self.train_predictor.predict(model=self.model, test_data=self.model_class.preprocess_data(test_data), label_column_index=self.model_class.label_column_index)
 
                 # get error for this window
                 if self.params['loss'] == "mean_absolute_percentage_error": # updated to keras' name for the loss
-                    error += self.model.mean_abs_percent_error(y_pred=preds, y_true=actuals)
+                    error += self.model_class.mean_abs_percent_error(y_pred=preds, y_true=actuals)
                 elif self.params['loss'] == "root_mean_squared_error":
-                    error += self.model.root_mean_squared_error(y_pred=preds, y_true=actuals)
+                    error += self.model_class.root_mean_squared_error(y_pred=preds, y_true=actuals)
                 else:
                     raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
                 test_n += 1
@@ -242,23 +246,19 @@ class Test:
             
                 # use last window for plotting
                 if self.plot:                        
-                    self.model.plot_results(preds=preds, actual=actuals,
-                                        title=f'{self.model.name} {ticker} Window {index+1} forcasted vs actual stock prices {window_params["start"]} to {window_params["end"]}',
-                                        folder=folder)
+                    self.model_class.plot_results(preds=preds, actual=actuals, title=f'{self.model_class.name} {ticker} Window {index+1} forcasted vs actual stock prices {window_params["start"]} to {window_params["end"]}', folder=folder)
                     if model_history is not None:
-                        self.model.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'],
-                                            title=f'{self.model.name} {ticker} Window {index+1} train vs validation loss', 
-                                            folder=folder)            
+                        self.model_class.plot_loss(t_loss=model_history.history['loss'], v_loss=model_history.history['val_loss'], title=f'{self.model_class.name} {ticker} Window {index+1} train vs validation loss', folder=folder)            
 
                 print('DONE PLOTTING')
                 index += 1
 
             # store average MAPE error
             avg_error = error/test_n
-            self.results[f'{self.model.name}:{ticker}'] = avg_error
+            self.results[f'{self.model_class.name}:{ticker}'] = avg_error
 
         # write errors to file
-        json_file = f'{folder}{self.model.name}.json'
+        json_file = f'{folder}{self.model_class.name}.json'
         dump = json.dumps(self.results)
         output_file = open(json_file, 'w')
         output_file.write(dump)
