@@ -61,7 +61,6 @@ class LSTM_Behar(Base_Model):
         model.add(Dense(1, activation='linear'))
         return model
 
-
 if __name__ == "__main__":
 
     ####################
