@@ -48,7 +48,9 @@ class SentimentModel():
 
         # plotting the regression model (uncomment to see)
         # plt.scatter(x,y,c='tab:blue')
-        # plt.plot(x,self.model.predict(x.reshape(-1,1)),c='tab:green')
+        # plt.plot(x,self.model.predict(x_poly),c='tab:green')
+        # plt.xlabel('average sentiment')
+        # plt.ylabel('fractional chance')
         # plt.show()
 
     def predict(self):
@@ -171,9 +173,9 @@ if __name__ == "__main__":
 
         model.train()
         preds,actual = model.predict()
-        
+       
         model.plot_results(preds=preds,actual=actual,
-                       title=f'SentimentModel {ticker} forcasted vs actual stock prices 2021-04-13 to 2021-04-19')
-        
+                        title=f'SentimentModel {ticker} forcasted vs actual stock prices 2021-04-13 to 2021-04-19')
+
         error = model.mean_abs_percent_error(y_pred=preds, y_true=actual)
         print(f'{ticker}: {error}')
