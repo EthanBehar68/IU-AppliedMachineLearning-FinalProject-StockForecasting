@@ -84,4 +84,4 @@ if __name__ == "__main__":
                 'normalization': False }
     
     test = Test(Model=LSTM_Moghar, Train_Predictor=Forecasting_Train_Predictor, params=params, tests=heavy_hitters_tests, plot=True)
-    test.fixed_origin_tests()
+    test.fixed_origin_tests('./imgs/4-25-etb/')

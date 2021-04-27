@@ -84,8 +84,8 @@ if __name__ == "__main__":
     #             'normalization': False }
     
     # test = Test(Model=LSTM_Behar, Train_Predictor=Overfit_Train_Predictor, params=params, tests=heavy_hitters_tests, plot=True)
-    # test.fixed_origin_tests()
-
+    # test.fixed_origin_tests('need a folder path')
+    
     # Use the tester files for running tests
     # This should be used only to make sure its working.
     
@@ -107,4 +107,4 @@ if __name__ == "__main__":
                 'normalization': False }
     
     test = Test(Model=LSTM_Behar, Train_Predictor=Forecasting_Train_Predictor, params=params, tests=heavy_hitters_tests, plot=True)
-    test.fixed_origin_tests()
+    test.fixed_origin_tests('./imgs/4-25-etb/')
