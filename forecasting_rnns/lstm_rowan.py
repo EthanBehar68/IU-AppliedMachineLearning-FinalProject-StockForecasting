@@ -81,4 +81,4 @@ if __name__ == "__main__":
               'window_scaling': False }
     
     test = Test(Model=LSTM_Rowan, Train_Predictor=Vstack_Train_Predictor, params=params, tests=window_heavy_hitters_tests, plot=True)
-    test.rolling_window_test('./forecasting_rnns/results/Rowan-Std-500-HighLowOpenClose/')
+    test.rolling_window_test('./forecasting_rnns/results/Rowan-Std-500-HighLowOpenClose-2/')
