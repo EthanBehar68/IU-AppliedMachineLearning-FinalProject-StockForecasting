@@ -84,10 +84,10 @@ if __name__ == "__main__":
     # Naming syntax please use
     # {Paper}-{Std/Norm}-{Win/''}-{Discr/''}-{epoch}-{train columns}
     params = {'lr': 0.001,
-                'loss': 'mean_absolute_percentage_error',
+                'loss': 'mean_absolute_percentage_error', 
                 'activation': 'tanh',
                 'recurrent_activation': 'sigmoid',
-                'epochs': 1,
+                'epochs': 500,
                 'batch_size': 150,
                 'd': 22,
                 'train_columns': ['high', 'low', 'open', 'close'],
@@ -100,45 +100,3 @@ if __name__ == "__main__":
     
     test = Test(Model=LSTM_Behar, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
     test.rolling_window_test('./forecasting_rnns/results/Behar-Std-500-HighLowOpenClose/')
-
-    # ['close'] Test
-    # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Discr/''}-{epoch}-{train columns}
-    params = {'lr': 0.001,
-                'loss': 'mean_absolute_percentage_error',
-                'activation': 'tanh',
-                'recurrent_activation': 'sigmoid',
-                'epochs': 1,
-                'batch_size': 150,
-                'd': 22,
-                'train_columns': ['close'],
-                'label_column': 'close', 
-                'name': 'Behar-Std-100-Close', 
-                'discretization': False,
-                'fill_method': 'previous',
-                'normalization': False,
-                'window_scaling': False }
-    
-    test = Test(Model=LSTM_Behar, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
-    test.rolling_window_test('./forecasting_rnns/results/Behar-Std-100-Close/')
-
-    # ['open'] Test
-    # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Win/''}-{Discr/''}-{epoch}-{train columns}
-    params = {'lr': 0.001, 
-                'loss': 'mean_absolute_percentage_error',
-                'activation': 'tanh',
-                'recurrent_activation': 'sigmoid',
-                'epochs': 1,
-                'batch_size': 150,
-                'd': 22,
-                'train_columns': ['open'],
-                'label_column': 'open', 
-                'name': 'Behar-Std-100-Open', 
-                'discretization': False,
-                'fill_method': 'previous',
-                'normalization': False,
-                'window_scaling': False } 
-    
-    test = Test(Model=LSTM_Behar, params=params, tests=window_heavy_hitters_tests, f='', plot=True)
-    test.rolling_window_test('./forecasting_rnns/results/Behar-Std-100-Open/')

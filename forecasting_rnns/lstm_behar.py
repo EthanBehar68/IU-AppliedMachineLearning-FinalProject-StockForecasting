@@ -167,24 +167,24 @@ if __name__ == "__main__":
 
     # Use the tester files for running tests
     # This should be used only to make sure its working.
-
+    
     # ['close'] Test
     # Naming syntax please use
     # {Paper}-{Std/Norm}-{Win/''}-{Round/''}-{epoch}-{train columns}-{Rolling/Fixed}
-    params = {'lr': 0.001, # learning rate
-                'loss': 'mean_absolute_percentage_error', # Loss function
-                'activation': 'tanh', # Not used
-                'recurrent_activation': 'sigmoid', # Not used
-                'epochs': 50, #250/500
+    params = {'lr': 0.001,
+                'loss': 'mean_absolute_percentage_error',
+                'activation': 'tanh',
+                'recurrent_activation': 'sigmoid',
+                'epochs': 100,
                 'batch_size': 150,
-                'd': 22, # Taken from Roonwidala et al.
+                'd': 22,
                 'train_columns': ['close'],
                 'label_column': 'close', 
                 'name': 'Behar-Std-250-Close-Fixed', 
-                'discretization': False, # Use value rounding?
-                'fill_method': 'previous', # fillna method='pa'
-                'normalization': False, # Normalize or standardization?
-                'window_scaling': True } # Window scaling or bulk scaling?
+                'discretization': False,
+                'fill_method': 'previous',
+                'normalization': False,
+                'window_scaling': True }
     
     test = Test(Model=LSTM_Behar, params=params, tests=heavy_hitters_tests, f='Behar-Std-250-Close-Fixed-heavy_hitters_tests.json', plot=True)
     test.fixed_origin_tests()
