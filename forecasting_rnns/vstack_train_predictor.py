@@ -74,7 +74,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
 
         return model, model_history
 
-    def predict(self, test_data, rolling_window_test=False):
+    def predict(self, model, test_data, label_column_index=None):
         test_close_prices = test_data['close'].values
 
         # Save train data and scaler obj because we will need it for testing
@@ -93,7 +93,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         preds = []
 
         for i in range(len(test_data)):
-            pred_std_close = self.model.predict(observed.reshape(1,self.d,1))
+            pred_std_close = model.predict(observed.reshape(1,self.d,1))
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
