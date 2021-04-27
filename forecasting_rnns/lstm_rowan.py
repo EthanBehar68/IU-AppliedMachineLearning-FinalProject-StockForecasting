@@ -11,6 +11,7 @@ from keras.metrics import RootMeanSquaredError
 from scipy.ndimage.filters import gaussian_filter
 from test import *
 from vstack_train_predictor import *
+from base_model import *
 
 class LSTM_Rowan(Base_Model):
     def __init__(self, params):
@@ -30,6 +31,7 @@ class LSTM_Rowan(Base_Model):
         self.scaler = None
         self.window_scaling = params['window_scaling']
         self.window_scalers = {}
+        self.label_column_index = None
 
     def preprocess_data(self, train_data):
         return train_data

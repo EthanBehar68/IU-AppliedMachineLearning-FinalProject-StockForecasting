@@ -3,10 +3,12 @@ from base_train_predictor import Base_Train_Predictor
 # Data Pre-processing
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 # RNN
-from keras.optimizers import RMSprop
+from keras.optimizers import Adam
 # General Needed libraries
 import pandas as pd
 import numpy as np
+from scipy.ndimage.filters import gaussian_filter
+
 
 # Uh... lazy and didn't split params between
 # Base Model and Base Train Predictor
@@ -27,6 +29,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         self.fill_method = params['fill_method']
         self.normalization = params['normalization']
         self.scaler = None
+        self.label_column_index = None
 
     # If label column is not part of x train
     # This needs to update
