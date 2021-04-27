@@ -64,7 +64,6 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         print('y_train shape before training: ', y_train.shape)
 
         # build the model
-        model = self.gen_model()
         model.compile(optimizer=Adam(learning_rate=self.lr), loss=self.loss)
         
         # train the model
