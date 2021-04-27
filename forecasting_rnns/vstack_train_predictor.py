@@ -40,7 +40,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         #plt.show()
 
         # gaussian smoothing kernel
-        self.train_obs = gaussian_filter(self.train_obs, sigma=10)
+        self.train_obs = gaussian_filter(self.train_obs, sigma=5)
         #plt.plot(range(0,len(self.train_obs)), self.train_obs)
         #plt.show()
 
@@ -83,7 +83,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         test_obs = test_data['close'].values
 
         # gaussian smoothing kernel
-        test_obs = gaussian_filter(test_obs, sigma=10)
+        test_obs = gaussian_filter(test_obs, sigma=5)
 
         # standardize data
         test_obs = self.scaler.transform(test_obs.reshape(-1,1))
