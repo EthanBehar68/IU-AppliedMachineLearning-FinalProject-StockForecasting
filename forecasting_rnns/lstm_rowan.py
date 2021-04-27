@@ -74,7 +74,7 @@ if __name__ == "__main__":
               'd': 20,
               'train_columns': ['close'],
               'label_column': 'close', 
-              'name': 'Rowan-MinMax-Guassian-Smooth', 
+              'name': 'Rowan-MinMax-Guassian-Smooth-sigma=5', 
               'discretization': False,
               'fill_method': 'previous',
               'normalization': True,
