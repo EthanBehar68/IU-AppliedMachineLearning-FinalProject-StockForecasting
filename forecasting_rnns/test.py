@@ -238,6 +238,9 @@ class Test:
                     error += self.model_class.mean_abs_percent_error(y_pred=preds, y_true=actuals)
                 elif self.params['loss'] == "root_mean_squared_error":
                     error += self.model_class.root_mean_squared_error(y_pred=preds, y_true=actuals)
+                # A bit weird - ask Rowan
+                elif self.params['loss'] == "mean_squared_error":
+                    error += self.model_class.mean_abs_percent_error(y_pred=preds, y_true=actuals)
                 else:
                     raise ValueError("Loss parameter isn't programmed or incorrect. Loss parameter: " + self.params['loss'])
                 test_n += 1
