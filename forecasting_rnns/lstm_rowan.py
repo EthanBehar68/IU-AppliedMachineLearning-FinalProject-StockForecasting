@@ -8,12 +8,11 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from keras.optimizers import Adam
 from keras.metrics import RootMeanSquaredError
-from model import Model
-from test import *
 from scipy.ndimage.filters import gaussian_filter
-from scipy import fft
+from test import *
+from vstack_train_predictor import *
 
-class LSTM_Rowan(Model):
+class LSTM_Rowan(Base_Model):
     def __init__(self, params):
         super().__init__(params)
         self.lr = params['lr']
@@ -32,86 +31,14 @@ class LSTM_Rowan(Model):
         self.window_scaling = params['window_scaling']
         self.window_scalers = {}
 
-    # If label column is not part of x train
-    # This needs to update
-    def train(self, train_data, rolling_window_test=False):
-        # Save train data and scaler obj because we will need it for testing
-        self.train_obs = train_data['close'].values
-        #plt.plot(range(0,len(self.train_obs)), self.train_obs)
-        #plt.show()
-
-        # gaussian smoothing kernel
-        self.train_obs = gaussian_filter(self.train_obs, sigma=10)
-        #plt.plot(range(0,len(self.train_obs)), self.train_obs)
-        #plt.show()
-
-        self.train_obs = self.train_obs.reshape(-1,1)
-        
-        # standardize data
-        self.scaler = MinMaxScaler(feature_range=(0,1))
-        self.scaler = self.scaler.fit(self.train_obs)
-        self.train_obs = self.scaler.transform(self.train_obs)
-        # self.train_obs = np.log(self.train_obs)
-
-        # Build the x as the observation from (O_i,...,O_i+d), y is O_i+d
-        x_train, y_train = [], []
-        for i in range(self.d, len(self.train_obs)):
-            x_train.append(self.train_obs[i-self.d:i])
-            y_train.append(self.train_obs[i])
-
-        x_train, y_train = np.array(x_train), np.array(y_train)
-        y_train = y_train.reshape(-1, 1)
-        print('x_train shape before training: ', x_train.shape)
-        print('y_train shape before training: ', y_train.shape)
-
-        # build the model
-        self.model = self.gen_model()
-        self.model.compile(optimizer=Adam(learning_rate=self.lr), loss=self.loss)
-        
-        # train the model
-        return self.model.fit(x=x_train, 
-                              y=y_train, 
-                              epochs=self.epochs, 
-                              batch_size=self.batch_size,
-                              validation_split=0.1,
-                              verbose=1)
-
-    def predict(self, test_data, rolling_window_test=False):
-        test_close_prices = test_data['close'].values
-
-        # Save train data and scaler obj because we will need it for testing
-        test_obs = test_data['close'].values
-
-        # gaussian smoothing kernel
-        test_obs = gaussian_filter(test_obs, sigma=10)
-
-        # standardize data
-        test_obs = self.scaler.transform(test_obs.reshape(-1,1))
-        # test_obs = np.log(test_obs)
-
-        # Add self.d amount of days in front of test data so test_data[0] can be first prediction point
-        observed = self.train_obs[-self.d:]
-
-        preds = []
-
-        for i in range(len(test_data)):
-            pred_std_close = self.model.predict(observed.reshape(1,self.d,1))
-            observed = np.vstack((observed,test_obs[i]))
-            observed = observed[1:]
-
-            pred_close = self.scaler.inverse_transform(pred_std_close)
-            preds.append(pred_close.reshape(1,))
-            
-            print(f'{i+1}/{len(test_data)}', end='\r', flush=True)
-
-        return np.array(preds).flatten(), test_close_prices
+    def preprocess_data(self, train_data):
+        return train_data
 
     def gen_model(self):
         model = Sequential()
         model.add(
             LSTM(128, 
                  input_shape=(self.d, len(self.train_columns)),
-                 bias_initializer='random_normal',
                  recurrent_dropout=0.1,
                  return_sequences=True
                  )
@@ -119,7 +46,6 @@ class LSTM_Rowan(Model):
         model.add(
            LSTM(64, 
                 input_shape=(self.d, len(self.train_columns)),
-                bias_initializer='random_normal',
                 recurrent_dropout=0.1,
                 )
            )
@@ -146,12 +72,11 @@ if __name__ == "__main__":
               'd': 20,
               'train_columns': ['close'],
               'label_column': 'close', 
-              'name': 'Rowan-Std-500-HighLowOpenClose', 
+              'name': 'Rowan-MinMax-Guassian-Smooth', 
               'discretization': False,
               'fill_method': 'previous',
               'normalization': True,
               'window_scaling': False }
     
-    test = Test(Model=LSTM_Rowan, params=params, tests=own_tests, f='rowan-forecast-lstm.json', plot=True)
-    #test.rolling_window_test('./forecasting_rnns/results/Rowan-Std-500-HighLowOpenClose/')
-    test.fixed_origin_tests()
+    test = Test(Model=LSTM_Rowan, Train_Predictor=Vstack_Train_Predictor, params=params, tests=window_heavy_hitters_tests, plot=True)
+    test.rolling_window_test('./forecasting_rnns/results/Rowan-Std-500-HighLowOpenClose/')
