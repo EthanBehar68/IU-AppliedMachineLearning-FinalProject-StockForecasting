@@ -12,31 +12,32 @@ heavy_hitters_tests = {
             {'ticker':'F', 'start':'2007-01-01', 'end':'2015-01-01'}, # Ford
         'test':
             {'ticker':'F', 'start':'2015-01-02', 'end':'2016-02-23'}
-    },
-    'test2': {
-        'train':
-            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'}, # Microsoft
-        'test':
-            {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
-    },
-    'test3': {
-        'train':
-            {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'}, # Amazon
-        'test':
-            {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
-    },
-    'test4': {
-        'train':
-            {'ticker':'MRK', 'start':'2007-01-01', 'end':'2015-01-01'}, # Merck & Co.
-        'test':
-            {'ticker':'MRK', 'start':'2015-01-02', 'end':'2016-01-02'}
-    },
-    'test5': {
-        'train':
-            {'ticker':'NKE', 'start':'2007-01-01', 'end':'2015-01-01'}, # Nike
-        'test':
-            {'ticker':'NKE', 'start':'2015-01-02', 'end':'2016-01-02'}
     }
+    # ,
+    # 'test2': {
+    #     'train':
+    #         {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2015-01-01'}, # Microsoft
+    #     'test':
+    #         {'ticker':'MSFT', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # },
+    # 'test3': {
+    #     'train':
+    #         {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2015-01-01'}, # Amazon
+    #     'test':
+    #         {'ticker':'AMZN', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # },
+    # 'test4': {
+    #     'train':
+    #         {'ticker':'MRK', 'start':'2007-01-01', 'end':'2015-01-01'}, # Merck & Co.
+    #     'test':
+    #         {'ticker':'MRK', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # },
+    # 'test5': {
+    #     'train':
+    #         {'ticker':'NKE', 'start':'2007-01-01', 'end':'2015-01-01'}, # Nike
+    #     'test':
+    #         {'ticker':'NKE', 'start':'2015-01-02', 'end':'2016-01-02'}
+    # }
 }
 
 window_heavy_hitters_tests = {
@@ -46,20 +47,11 @@ window_heavy_hitters_tests = {
     },
     'test2': {
         'window':
-            {'ticker':'MSFT', 'start':'2007-01-01', 'end':'2016-02-23'}, # Microsoft
-    }
-    ,
-    'test3': {
-        'window':
             {'ticker':'AMZN', 'start':'2007-01-01', 'end':'2016-02-23'}, # Amazon
     },
-    'test4': {
+    'test3': {
         'window':
             {'ticker':'MRK', 'start':'2007-01-01', 'end':'2016-02-23'}, # Merck & Co.
-    },
-    'test5': {
-        'window':
-            {'ticker':'NKE', 'start':'2007-01-01', 'end':'2016-02-23'}, # Nike
     }
 }
 

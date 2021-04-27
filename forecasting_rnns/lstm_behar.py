@@ -93,7 +93,7 @@ class LSTM_Behar(Model):
             test_data = self.preprocess_data(test_data)
 
         # Add self.d amount of days in front of test data so test_data[0] can be first prediction point
-        test_obs = np.concatenate((self.train_obs[-(self.d-1):], test_data.values), axis=0)
+        test_obs = np.concatenate((self.train_obs[-self.d:], test_data.values), axis=0)
 
         # Normalization/Standization for whole data set
         if not self.window_scaling:
@@ -153,18 +153,18 @@ class LSTM_Behar(Model):
 
     def gen_model(self):
         model = Sequential()
-        model.add(LSTM(512, input_shape=(self.d, len(self.train_columns)), return_sequences=True))
-        model.add(Dropout(0.1))
-        model.add(LSTM(256, return_sequences=False))
-        model.add(Dropout(0.1))
-        model.add(Dense(64, activation='relu'))
-        model.add(Dropout(0.1))
+        model.add(LSTM(128, input_shape=(self.d, len(self.train_columns)), return_sequences=True))
+        model.add(Dropout(0.3))
+        model.add(LSTM(64, return_sequences=False))
+        model.add(Dropout(0.3))
+        model.add(Dense(16, activation='relu'))
+        model.add(Dropout(0.3))
         model.add(Dense(1, activation='linear'))
         return model
 
 
 if __name__ == "__main__":
-    
+
     # Use the tester files for running tests
     # This should be used only to make sure its working.
 
