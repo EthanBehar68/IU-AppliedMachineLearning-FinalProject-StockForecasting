@@ -1,6 +1,6 @@
 from test import *
 from lstm_pawar import *
-from X_train_predictor import *
+from forecasting_train_predictor import *
 
 if __name__ == "__main__":
 ####################
