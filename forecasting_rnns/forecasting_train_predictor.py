@@ -27,19 +27,27 @@ class Forecasting_Train_Predictor(Base_Train_Predictor):
         self.fill_method = params['fill_method']
         self.normalization = params['normalization']
         self.scaler = None
+        self.scaler_out = None
 
     # WARN This breaks if label column is not a training column
     def train(self, model, train_data, label_column_index):
         # Save train data and scaler obj because we will need it for testing
         self.train_obs = train_data.values
+        self.train_labels = self.train_obs[:,label_column_index]
 
         # Normalization/Standization for whole data set
         if self.normalization:
             self.scaler = MinMaxScaler(feature_range=(0,1))
+            self.scaler_out = MinMaxScaler(feature_range=(0,1))
         else:
             self.scaler = StandardScaler()
-        x_train_scale = self.scaler.fit_transform(self.train_obs)
-        y_train_scale = x_train_scale[:, label_column_index]        
+            self.scaler_out = StandardScaler()
+        
+        self.scaler = self.scaler.fit(self.train_obs)
+        x_train_scale = self.scaler.transform(self.train_obs)
+
+        self.scaler_out = self.scaler_out.fit(self.train_labels.reshape(-1,1))
+        y_train_scale = self.scaler_out.transform(self.train_labels.reshape(-1,1))   
 
         # Build the x as the observation from (O_i,...,O_i+d), y is O_i+d
         x_train, y_train = [], []
@@ -68,17 +76,17 @@ class Forecasting_Train_Predictor(Base_Train_Predictor):
     def predict(self, model, test_data, label_column_index):
         # Add self.d amount of days in front of test data so test_data[0] can be first prediction point
         test_obs = np.concatenate((self.train_obs[-self.d:], test_data.values), axis=0)
-
+        
         # Normalization/Standization for whole data set
         test_scale_obs = self.scaler.transform(test_obs)
-        test_scale_label = test_scale_obs[:, label_column_index]       
+        test_label = test_obs[:, label_column_index]       
 
         # Build observations like in training
         x_test, labels = [], []
-        for i in range(self.d, len(test_data)):
+        for i in range(self.d, len(test_obs)):
             # Normalization/Standization for whole data set
             x_test.append(test_scale_obs[i-self.d:i])
-            labels.append(test_scale_label[i])
+            labels.append(test_label[i])
 
         x_test, labels = np.array(x_test), np.array(labels)
         labels = labels.reshape(-1, 1)
@@ -86,6 +94,7 @@ class Forecasting_Train_Predictor(Base_Train_Predictor):
         print('x_test shape before prediction: ' , x_test.shape)
         # predict the points
         preds = model.predict(x_test)
+        preds = self.scaler_out.inverse_transform(preds)
         print('preds: ' , preds.shape)
         print('labels: ', labels.shape)
 
