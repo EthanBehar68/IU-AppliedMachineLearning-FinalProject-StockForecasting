@@ -30,6 +30,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         self.normalization = params['normalization']
         self.scaler = None
         self.label_column_index = None
+        self.sigma = params['sigma']
 
     # If label column is not part of x train
     # This needs to update
@@ -47,7 +48,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         self.train_obs = self.scaler.transform(self.train_obs)
 
         # gaussian smoothing kernel
-        self.train_obs = gaussian_filter(self.train_obs, sigma=5)
+        self.train_obs = gaussian_filter(self.train_obs, sigma=self.sigma)
         #plt.plot(range(0,len(self.train_obs)), self.train_obs)
         #plt.show()
 
@@ -89,7 +90,7 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         # test_obs = np.log(test_obs)
 
         # gaussian smoothing kernel
-        test_obs = gaussian_filter(test_obs, sigma=5)
+        test_obs = gaussian_filter(test_obs, sigma=self.sigma)
 
         # Add self.d amount of days in front of test data so test_data[0] can be first prediction point
         observed = self.train_obs[-self.d:]
