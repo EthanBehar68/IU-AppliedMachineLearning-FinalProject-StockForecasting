@@ -32,6 +32,7 @@ class LSTM_Rowan(Base_Model):
         self.window_scaling = params['window_scaling']
         self.window_scalers = {}
         self.label_column_index = None
+        self.sigma = params['sigma']
 
     def preprocess_data(self, train_data):
         return train_data
@@ -78,7 +79,8 @@ if __name__ == "__main__":
               'discretization': False,
               'fill_method': 'previous',
               'normalization': True,
-              'window_scaling': False }
+              'window_scaling': False,
+              'sigma': 10}
     
     test = Test(Model=LSTM_Rowan, Train_Predictor=Vstack_Train_Predictor, params=params, tests=window_heavy_hitters_tests, plot=True)
     test.rolling_window_test('./forecasting_rnns/results/Rowan-Std-500-HighLowOpenClose-2/')
