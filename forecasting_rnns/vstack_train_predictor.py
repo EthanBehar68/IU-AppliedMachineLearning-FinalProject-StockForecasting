@@ -39,17 +39,18 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         #plt.plot(range(0,len(self.train_obs)), self.train_obs)
         #plt.show()
 
+        self.train_obs = self.train_obs.reshape(-1,1)
+        
+        # standardize data
+        self.scaler = StandardScaler()
+        self.scaler = self.scaler.fit(self.train_obs)
+        self.train_obs = self.scaler.transform(self.train_obs)
+
         # gaussian smoothing kernel
         self.train_obs = gaussian_filter(self.train_obs, sigma=5)
         #plt.plot(range(0,len(self.train_obs)), self.train_obs)
         #plt.show()
 
-        self.train_obs = self.train_obs.reshape(-1,1)
-        
-        # standardize data
-        self.scaler = MinMaxScaler(feature_range=(0,1))
-        self.scaler = self.scaler.fit(self.train_obs)
-        self.train_obs = self.scaler.transform(self.train_obs)
         # self.train_obs = np.log(self.train_obs)
 
         # Build the x as the observation from (O_i,...,O_i+d), y is O_i+d
@@ -77,17 +78,18 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
         return model, model_history
 
     def predict(self, model, test_data, label_column_index=None):
-        test_close_prices = test_data['close'].values
-
+        true_vals = test_data['close'].values
+        true_scaled_vals = self.scaler.transform(true_vals.reshape(-1,1))
+        
         # Save train data and scaler obj because we will need it for testing
         test_obs = test_data['close'].values
-
-        # gaussian smoothing kernel
-        test_obs = gaussian_filter(test_obs, sigma=5)
 
         # standardize data
         test_obs = self.scaler.transform(test_obs.reshape(-1,1))
         # test_obs = np.log(test_obs)
+
+        # gaussian smoothing kernel
+        test_obs = gaussian_filter(test_obs, sigma=5)
 
         # Add self.d amount of days in front of test data so test_data[0] can be first prediction point
         observed = self.train_obs[-self.d:]
@@ -99,9 +101,8 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
 
-            pred_close = self.scaler.inverse_transform(pred_std_close)
-            preds.append(pred_close.reshape(1,))
+            preds.append(pred_std_close.reshape(1,))
             
             print(f'{i+1}/{len(test_data)}', end='\r', flush=True)
 
-        return np.array(preds).flatten(), test_close_prices
+        return np.array(preds).flatten(), true_scaled_vals
