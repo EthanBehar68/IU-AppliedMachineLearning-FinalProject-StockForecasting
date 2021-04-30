@@ -12,7 +12,7 @@ Work for Section 3.2 "Models for Raw Close Price Prediction" can be found in raw
     - Any other *test*.py files are entry points for test.py.  
     - Playgound.py is a file used to test random bits of code and can be ignored.  
     - The old folder can be ignored. It contains early works that we've moved away from.  
-    - The results folder contains the graphs for each of the tests organized by specific test.  
+    - The results folder contains the graphs for each of the tests organized by specific test name.  
       - The excessive folder contains many more graphs of tests we ran but realized was unnecessary.  
 
 Work for our sentiment anaylsis proof of concept can be found in sentiment.
