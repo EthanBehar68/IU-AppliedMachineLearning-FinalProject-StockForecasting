@@ -58,7 +58,6 @@ class LSTM_Roondiwala(Base_Model):
 
 
 if __name__ == "__main__":
-
     # Use the tester files for running tests
     # This should be used only to make sure its working.
 

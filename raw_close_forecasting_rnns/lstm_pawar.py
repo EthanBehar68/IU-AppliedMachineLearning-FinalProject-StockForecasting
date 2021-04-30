@@ -46,7 +46,6 @@ class LSTM_Pawar(Base_Model):
 
         return data
 
-
     # Faithfully recreating Roondiwala as close as possible
     def gen_model(self):
         model = Sequential()

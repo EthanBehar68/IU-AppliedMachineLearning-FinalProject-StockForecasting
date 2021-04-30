@@ -55,7 +55,6 @@ window_heavy_hitters_tests = {
     }
 }
 
-# file to test using multiple tickers with dates
 paper_tests = {
     'test1': {
         'train':
@@ -71,7 +70,6 @@ paper_tests = {
     }
 }
 
-# own tests, more training data, and more recent stocks
 own_tests = {
     'test1': {
         'train':
@@ -159,7 +157,7 @@ class Test:
             self.model = self.model_class.gen_model()
             self.train_predictor = self.Train_Predictor(params=self.params)
 
-            # collect data from fastquant/quandl
+            # collect data from fastquant
             train_data = self.model_class.get_data(ticker=ticker,
                                         start_date=training_params['start'],
                                         end_date=training_params['end'])

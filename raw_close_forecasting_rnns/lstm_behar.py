@@ -29,6 +29,10 @@ class LSTM_Behar(Base_Model):
         self.normalization = params['normalization']
         self.scaler = None
 
+    # Now that I think of it, 
+    # these two _data methods could've went in the
+    # base class to reduce code duplication even further.
+    # Mabybe I'll do that post submission.
     # Return data from fastquant
     def get_data(self, ticker, start_date, end_date):
         return self.preprocess_data(get_stock_data(ticker, start_date, end_date))
@@ -62,6 +66,8 @@ class LSTM_Behar(Base_Model):
         return model
 
 if __name__ == "__main__":
+    # Use the tester files for running tests
+    # This should be used only to make sure its working.
 
     ####################
     # Overfitting test #
@@ -85,9 +91,6 @@ if __name__ == "__main__":
     
     # test = Test(Model=LSTM_Behar, Train_Predictor=Overfit_Train_Predictor, params=params, tests=heavy_hitters_tests, plot=True)
     # test.fixed_origin_tests('need a folder path')
-    
-    # Use the tester files for running tests
-    # This should be used only to make sure its working.
     
     # ['close'] Test
     # Naming syntax please use

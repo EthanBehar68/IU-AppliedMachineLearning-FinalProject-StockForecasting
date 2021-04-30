@@ -4,9 +4,6 @@ from forecasting_train_predictor import *
 
 
 if __name__ == "__main__":
-####################
-# Moghar Tests #
-####################
     # ['open'] Test
     # Naming syntax please use
     # {Paper}-{Std/Norm}-{Discr/''}-{epoch}-{train columns}-{Rolling/Fixed}

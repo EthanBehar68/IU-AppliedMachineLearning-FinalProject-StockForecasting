@@ -3,9 +3,6 @@ from lstm_behar import *
 from forecasting_train_predictor import *
 
 if __name__ == "__main__":
-####################
-# Behar Tests #
-####################
     # ['high', 'low', 'open', 'close'] Test
     # Naming syntax please use
     # {Paper}-{Std/Norm}-{Discr/''}-{epoch}-{train columns}-{Rolling/Fixed}

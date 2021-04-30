@@ -37,8 +37,8 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
     def train(self, model, train_data, label_column_index=None):
         # Save train data and scaler obj because we will need it for testing
         self.train_obs = train_data['close'].values
-        #plt.plot(range(0,len(self.train_obs)), self.train_obs)
-        #plt.show()
+        # plt.plot(range(0,len(self.train_obs)), self.train_obs)
+        # plt.show()
 
         self.train_obs = self.train_obs.reshape(-1,1)
         
@@ -49,8 +49,8 @@ class Vstack_Train_Predictor(Base_Train_Predictor):
 
         # gaussian smoothing kernel
         self.train_obs = gaussian_filter(self.train_obs, sigma=self.sigma)
-        #plt.plot(range(0,len(self.train_obs)), self.train_obs)
-        #plt.show()
+        # plt.plot(range(0,len(self.train_obs)), self.train_obs)
+        # plt.show()
 
         # self.train_obs = np.log(self.train_obs)
 

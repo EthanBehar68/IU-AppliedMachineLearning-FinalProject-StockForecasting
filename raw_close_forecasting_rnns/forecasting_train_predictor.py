@@ -43,9 +43,11 @@ class Forecasting_Train_Predictor(Base_Train_Predictor):
             self.scaler = StandardScaler()
             self.scaler_out = StandardScaler()
         
+        # Scale observations
         self.scaler = self.scaler.fit(self.train_obs)
         x_train_scale = self.scaler.transform(self.train_obs)
 
+        # Scale Labels - different scalers due to predict
         self.scaler_out = self.scaler_out.fit(self.train_labels.reshape(-1,1))
         y_train_scale = self.scaler_out.transform(self.train_labels.reshape(-1,1))   
 
@@ -92,8 +94,9 @@ class Forecasting_Train_Predictor(Base_Train_Predictor):
         labels = labels.reshape(-1, 1)
 
         print('x_test shape before prediction: ' , x_test.shape)
-        # predict the points
+        # Predict the points
         preds = model.predict(x_test)
+        # Reverse scaling
         preds = self.scaler_out.inverse_transform(preds)
         print('preds: ' , preds.shape)
         print('labels: ', labels.shape)

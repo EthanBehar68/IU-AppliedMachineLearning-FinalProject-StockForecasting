@@ -70,7 +70,8 @@ class Overfit_Train_Predictor(Base_Train_Predictor):
 
         # Normalization/Standization for whole data set
         scale_train_obs = self.scaler.transform(self.train_obs)
-            
+        
+        # Predict using model's predictions
         observed = scale_train_obs[-self.d:]
         preds, labels = [], []
         for i in range(len(test_data)):

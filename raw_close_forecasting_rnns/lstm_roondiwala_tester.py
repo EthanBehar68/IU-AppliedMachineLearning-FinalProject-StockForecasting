@@ -3,9 +3,6 @@ from lstm_roondiwala import *
 from forecasting_train_predictor import *
 
 if __name__ == "__main__":
-####################
-# Roondiwala Tests #
-####################
     # ['high', 'low', 'open', 'close'] Test
     # Naming syntax please use
     # {Paper}-{Std/Norm}-{Discr/''}-{epoch}-{train columns}-{Rolling/Fixed}

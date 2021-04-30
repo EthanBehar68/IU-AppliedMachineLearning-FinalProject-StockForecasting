@@ -85,4 +85,6 @@ class Base_Model(ABC):
         ax.xaxis.grid(True,ls='--')
         ax.yaxis.grid(True,ls='--')
         ax.legend()
-        plt.savefig(f'../imgs/{title}.png')
+        # plt.savefig(f'../imgs/{title}.png')
+        # Ethan needs this if running from .py file.
+        plt.savefig(f'{folder}{title}.png')
