@@ -17,7 +17,7 @@ Work for Section 3.2 "Models for Raw Close Price Prediction" can be found in raw
 
 Work for our sentiment anaylsis proof of concept can be found in sentiment.
 
-## requirements
+## Requirements
 
 Make sure you are using python3.6 (highest version of python tensorflow works with). Create a virtual environment by running:
 
