@@ -87,25 +87,26 @@ results = {}
 
 
 for ticker,_ in zip(training.keys(), testing.keys()):
+    train_predictor = Forecasting_Train_Predictor(params=params)
+    model = behar.gen_model()
+
     print(ticker)
     print('getting stock data')
     start = training[ticker]['start']
     end = training[ticker]['end']
-    training_data = get_stock_data(ticker, start, end)
+    training_data = behar.get_data(ticker, start, end)
 
     start = testing[ticker]['start']
     end = testing[ticker]['end']
-    back_test_data = get_stock_data(ticker, start, end)
+    back_test_data = behar.get_data(ticker, start, end)
+
 
     print('training...')
-    model = behar.gen_model()
-    model.compile(optimizer='adam', loss='mse')
     #print(type(training_data))
     #print(training_data.info())
     #print(training_data.head())
-    training_data = training_data['close']
-    model.fit(training_data)
-    preds, actual = behar.predict(test_data=back_test_data)
+    model, _ = train_predictor.train(model, training_data, behar.label_column_index)
+    preds, actual = train_predictor.predict(model, back_test_data, behar.label_column_index)
 
     preds = pd.DataFrame(data=np.array(preds), columns=['yhat'])
     expected_1day_return = preds['yhat'].pct_change().shift(-1).multiply(100)
@@ -125,7 +126,6 @@ for ticker,_ in zip(training.keys(), testing.keys()):
 
 
 
-    print(res.info())
 
     results[f'{ticker}, {start}-{end}'] = percentage_gain(float(res['init_cash']), float(res['final_value']))
 
@@ -138,24 +138,3 @@ output_file.close()
 
 
 
-if __name__ == "__main__":
-    # ['high', 'low', 'open', 'close'] Test
-    # Naming syntax please use
-    # {Paper}-{Std/Norm}-{Discr/''}-{epoch}-{train columns}-{Rolling/Fixed}
-    params = {'lr': 0.001,
-                'loss': 'mean_absolute_percentage_error', 
-                'activation': 'tanh',
-                'recurrent_activation': 'sigmoid',
-                'epochs': 500,
-                'batch_size': 150,
-                'd': 22,
-                'train_columns': ['high', 'low', 'open', 'close'],
-                'label_column': 'close', 
-                'name': 'Behar-Std-500-HighLowOpenClose',
-                'discretization': False,
-                'fill_method': 'previous',
-                'normalization': False}
-    
-    test = Test(Model=LSTM_Behar, Train_Predictor=Forecasting_Train_Predictor, params=params, tests=window_heavy_hitters_tests, plot=True)
-    # Make sure this folder is create or MatLibPlot will error out!!
-    test.rolling_window_test('./forecasting_rnns/results/Behar-Std-500-HighLowOpenClose/')

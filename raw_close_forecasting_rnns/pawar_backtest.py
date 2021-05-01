@@ -1,28 +1,19 @@
+from lstm_behar import LSTM_Behar
 from fastquant import backtest, get_stock_data
 import pickle
-from gaussian_hmm import *
 import json
-#from forecasting_train_predictor import *
-#from overfit_train_predictor import *
+from test import *
+from lstm_pawar import *
+from forecasting_train_predictor import *
+
+
 
 # want to train on this data, need access to gaussian_hmm file
-df = get_stock_data('AAPL', '2020-01-01','2020-12-31')
-
-
-params = {
-    'n_components': 2,
-    'algorithm': 'map',
-    'n_iter': 100,
-    'd': 5,
-    'name':'GHMM'
-}
+#df = get_stock_data('AAPL', '2020-01-01','2020-12-31')
 
 
 def percentage_gain(init, end):
     return (end-init)/init
-
-
-
 
 
 training = {
@@ -73,28 +64,49 @@ testing = {
 }
 
 
+params = {
+    'lr': 0.001,
+    'loss': 'mean_absolute_percentage_error', 
+    'activation': 'tanh',
+    'recurrent_activation': 'sigmoid',
+    'epochs': 500,
+    'batch_size': 150,
+    'd': 22,
+    'train_columns': ['high', 'low', 'open', 'close'],
+    'label_column': 'close', 
+    'name': 'Behar-Std-500-HighLowOpenClose',
+    'discretization': False,
+    'fill_method': 'previous',
+    'normalization': False
+}
 
 
 
-ghmm = GHMM(params=params)
+pawar = LSTM_Pawar(params=params)
 results = {}
 
 
 for ticker,_ in zip(training.keys(), testing.keys()):
+    train_predictor = Forecasting_Train_Predictor(params=params)
+    model = pawar.gen_model()
+
     print(ticker)
     print('getting stock data')
     start = training[ticker]['start']
     end = training[ticker]['end']
-    training_data = get_stock_data(ticker, start, end)
-    #training_data = training_data.drop(['volume'], axis=1)
+    training_data = pawar.get_data(ticker, start, end)
 
     start = testing[ticker]['start']
     end = testing[ticker]['end']
-    back_test_data = get_stock_data(ticker, start, end)
+    back_test_data = pawar.get_data(ticker, start, end)
+
 
     print('training...')
-    ghmm.train(train_data=training_data)
-    preds, actual = ghmm.predict(test_data=back_test_data)
+    #print(type(training_data))
+    #print(training_data.info())
+    #print(training_data.head())
+    model, _ = train_predictor.train(model, training_data, pawar.label_column_index)
+    preds, actual = train_predictor.predict(model, back_test_data, pawar.label_column_index)
 
     preds = pd.DataFrame(data=np.array(preds), columns=['yhat'])
     expected_1day_return = preds['yhat'].pct_change().shift(-1).multiply(100)
@@ -114,12 +126,11 @@ for ticker,_ in zip(training.keys(), testing.keys()):
 
 
 
-    print(res.info())
 
     results[f'{ticker}, {start}-{end}'] = percentage_gain(float(res['init_cash']), float(res['final_value']))
 
 
 dump = json.dumps(results)
-output_file = open('fastquant_results.json', 'w')
+output_file = open('pawar_fastquant_results.json', 'w')
 output_file.write(dump)
 output_file.close()
