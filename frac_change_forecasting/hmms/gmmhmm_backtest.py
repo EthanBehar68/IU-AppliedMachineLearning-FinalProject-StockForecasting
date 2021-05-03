@@ -83,11 +83,14 @@ results = {}
 for ticker,_ in zip(training.keys(), testing.keys()):
     print(ticker)
     print('getting stock data')
+    
+    # pull in the data
     start = training[ticker]['start']
     end = training[ticker]['end']
     training_data = get_stock_data(ticker, start, end)
     #training_data = training_data.drop(['volume'], axis=1)
 
+    # create df for back testing
     start = testing[ticker]['start']
     end = testing[ticker]['end']
     back_test_data = get_stock_data(ticker, start, end)
@@ -96,6 +99,7 @@ for ticker,_ in zip(training.keys(), testing.keys()):
     ghmm.train(train_data=training_data)
     preds, actual = ghmm.predict(test_data=back_test_data)
 
+    # get predictions, change them to percent changes and inverse them
     preds = pd.DataFrame(data=np.array(preds), columns=['yhat'])
     expected_1day_return = preds['yhat'].pct_change().shift(-1).multiply(100)
     back_test_data['custom'] = expected_1day_return.multiply(-1).values

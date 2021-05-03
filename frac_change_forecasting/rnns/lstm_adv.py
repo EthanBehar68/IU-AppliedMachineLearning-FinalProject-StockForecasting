@@ -65,19 +65,23 @@ class LSTMModel(Model):
                        verbose=1)
 
     def predict(self, test_data):
+        # scale the test observations
         test_close_prices = test_data['close'].values
         test_open_prices = test_data['open'].values
         test_obs = self.scaler.transform(self.data_prep(test_data).values)
 
+        # create first set of observations to be passed to the model
         observed = self.train_obs[-self.d:]
 
         preds = []
 
         for i in range(len(test_data)):
+            # predict and stack the next test point onto the observed list
             pred_frac_change = self.model.predict(observed.reshape(1,self.d,3))
             observed = np.vstack((observed,test_obs[i]))
             observed = observed[1:]
-
+            
+            # inverse transform the prediction and solve for close price
             pred_frac_change = self.scaler_out.inverse_transform(pred_frac_change)
             pred_close = pred_frac_change*test_open_prices[i]+test_open_prices[i]
             preds.append(pred_close.reshape(1,))
@@ -94,6 +98,7 @@ class LSTMModel(Model):
 
         return df
 
+    # define model structure
     def gen_model(self):
         model = Sequential()
         model.add(LSTM(512,input_shape=(self.d, 3), return_sequences=True,activation=self.activation,recurrent_activation=self.recurrent_activation))

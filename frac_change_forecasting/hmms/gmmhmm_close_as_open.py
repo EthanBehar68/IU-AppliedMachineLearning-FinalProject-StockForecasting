@@ -103,7 +103,7 @@ class GmmHMM:
                     if log_lik > best['log_lik']:
                         best['obs'],best['log_lik'] = obs,log_lik
 
-            # actually stack the best day on to the observations to use for next test point
+            # stack our prediction onto the observation list in attempt at true forecasting
             # drop the first thing in observed to shift our latency window `d`
             observed = np.vstack((observed,best['obs']))
             observed = observed[1:]
