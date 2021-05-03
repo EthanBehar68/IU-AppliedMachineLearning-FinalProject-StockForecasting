@@ -8,7 +8,7 @@ Work for Section 3.1 "Models for Fractional Change Prediction" can be found in f
     - `gaussian_hmm.py` contains the GHMM model.
     - `backtesting.ipynb`,  `gmmhmm_backtest.py` both contain the backtesting test for the GHMM.
     - `gmmhmm_slow.py` contains the origional work before the multithreading speed increase.
-    - 'gmmhmm_close_as_open.py` contains the experiment of using the gmmhmm model as true forecasting (using the predicted closing price as the next days opening price).
+    - `gmmhmm_close_as_open.py` contains the experiment of using the gmmhmm model as true forecasting (using the predicted closing price as the next days opening price).
     - `gmmhmm_vol.py` contains the experiment for using volume as an additional dimension of the observation vector.
     - `gmmhmm_grid_search.py` contains the experiment for grid searching to find the optimal hyperparameters for the model. 
     - `data_explore.ipynb` is a data exploration notebook which birthed the idea for gaussian smoothing and sampling candidates from the fractional change distribution of a given stock.
