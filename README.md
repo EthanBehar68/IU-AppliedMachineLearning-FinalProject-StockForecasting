@@ -2,7 +2,7 @@
 
 ## Notes for Dr. Williamson and Junyi
 
-Work for Section 3.1 "Models for Fractional Change Prediction" can be found in frac_change_forecasting.
+Work for Section 3.1 "Models for Fractional Change Prediction" can be found in `frac_change_forecasting`.
 - Within `hmms`
     - `gmmhmm_base.py` contains the GMMHMM model.
     - `gaussian_hmm.py` contains the GHMM model.
@@ -22,7 +22,7 @@ Work for Section 3.1 "Models for Fractional Change Prediction" can be found in f
 
 The `results` folder contains subfolders which hold the MAPE results in json files for the different tests. And the `imgs` folder contains the graphs for all of the models built in section 3.1, along with a random folder which can be ignored (contains random graphs from other experiments).
 
-Work for Section 3.2 "Models for Raw Close Price Prediction" can be found in raw_close_forecasting_rnns.  
+Work for Section 3.2 "Models for Raw Close Price Prediction" can be found in `raw_close_forecasting_rnns`.  
   - Within this folder:  
     - `lstm_X.py` contain the models we built.  
     - `X_train_predictor.py` contain the train/predict methods used on the models.  
@@ -32,6 +32,8 @@ Work for Section 3.2 "Models for Raw Close Price Prediction" can be found in raw
     - The `old` folder can be ignored. It contains early works that we've moved away from.  
     - The `results` folder contains the graphs for each of the tests organized by specific test name.  
       - The `excessive` folder contains many more graphs of tests we ran but realized was unnecessary.  
+
+For both folders, `frac_change_forecasting` and `raw_close_forecasting_rnns`, you can find files with "\_backtest" in them. These files contain the code that uses the models for backtesting. Results from our tests can be found in the `results` folder under the parent folder. Either in the `Fastquant` or `Backtest Results` folders.
 
 Work for our sentiment anaylsis proof of concept can be found in `sentiment`.
 
