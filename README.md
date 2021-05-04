@@ -46,6 +46,13 @@ Work for our sentiment anaylsis proof of concept can be found in `sentiment`.
   * `preprocessing` contains the scripts used for cleaning scraped tweets and generating csv files from them.
   * `data` contains the scraped tweets and csv files used in training and testing network architectures.
 
+* `model_exploration.ipynb` is a playground notebook used for experimenting with the data, and attempting to find a correlation between previous day sentiment and next day fractional change.
+* `sentiment_model.py` is a wrapper class for attempting to predict next day fractional change from previous days sentiment
+* `sentiment_trend.py` is an experiment for predicting up and down trends based on previous days sentiment
+* `tweet_collector.py` is a wrapper class for the twitter API, it also uses the flair library to classify tweets as positive and negative as they are collected.
+* `twitter_playground.ipynb` is a notebook that was used for experimentation to get the tweet scraping working
+* the `graphs` folder contains a few graphs of experimenting with using `sentiment_model.py` as a predictor for a stocks next day closing price
+
 ## Requirements
 
 Make sure you are using python3.6 (highest version of python tensorflow works with). Create a virtual environment by running:
