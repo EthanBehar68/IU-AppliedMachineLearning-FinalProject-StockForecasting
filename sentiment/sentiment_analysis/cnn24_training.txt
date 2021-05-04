@@ -1,0 +1,3 @@
+Number of training examples: 107518
+Number of validation examples: 26879
+Number of testing examples: 33600
