@@ -37,6 +37,15 @@ For both folders, `frac_change_forecasting` and `raw_close_forecasting_rnns`, yo
 
 Work for our sentiment anaylsis proof of concept can be found in `sentiment`.
 
+* Within `sentiment_analysis`
+  * `driver.py` is a python script the drives the training and testing of the DNN and CNN networks used in the sentiment analysis of the tweet dataset.
+  * `graphs` contains the learning curves for the networks tested.
+  * `models` contains python files describing general network structure for DNN and CNN types.
+  * `util/utils.py` contains utility functions that aid in the training of the neural networks such as training, evaluation, and iterator creation
+  * `scraper` contains a script for scraping and pickling tweets from Twitter using the tweepy API.
+  * `preprocessing` contains the scripts used for cleaning scraped tweets and generating csv files from them.
+  * `data` contains the scraped tweets and csv files used in training and testing network architectures.
+
 ## Requirements
 
 Make sure you are using python3.6 (highest version of python tensorflow works with). Create a virtual environment by running:
