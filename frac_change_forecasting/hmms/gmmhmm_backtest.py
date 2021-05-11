@@ -109,7 +109,7 @@ for ticker,_ in zip(training.keys(), testing.keys()):
                     sell_prop=1,
                     return_history=True,
                     execution_type='close',
-                    plot=False,
+                    #plot=False,
                     verbose=0)
 
 
